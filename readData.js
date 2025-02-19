@@ -323,9 +323,10 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
 
             const headers = ["Parametro", "Valore"];                                            // Intestazione fissa
 
-            const tableData = Object.entries(headerTitles).map(([key, value]) => [
+            const tableData = Object.entries(headerTitles).filter(([_,value])=>value)
+            .map(([key, value]) => [
                 key.replace(/_/g, " "),                                                         // sostituisce "_" con " "
-                value ? String(value) : ""                                                      // Converte tutti i valori in stringa per evitare errori
+                value ? String(value) : key++                                                      // Converte tutti i valori in stringa per evitare errori
             ]);
 
             const marginLeft = 10;
