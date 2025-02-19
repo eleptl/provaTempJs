@@ -161,10 +161,20 @@
     "elencoPuntatoSottoGrafico4" : "Prova4",    
     "elencoPuntatoSottoGrafico5" : "Prova5",    
     "elencoPuntatoSottoGrafico6" : "Prova6",   
-    "elencoPuntatoSottoGrafico7" : "Prova7",    
-    "elencoPuntatoSottoGrafico8" : "Prova8",    
-    "elencoPuntatoSottoGrafico9" : "Prova9",    
-    "elencoPuntatoSottoGrafico10" : "Prova10"
+    
+    "elencoPuntatoSottoGrafico8" : "Prova7",  
+    "elencoPuntatoSottoGrafico9" : "Prova8",    
+    "elencoPuntatoSottoGrafico10" : "Prova9",    
+    "elencoPuntatoSottoGrafico11" : "Prova10",   
+
+    "elencoPuntatoLatoFoto1" : "Prova1",    
+    "elencoPuntatoLatoFoto2" : "Prova2",    
+    "elencoPuntatoLatoFoto3" : "Prova3",    
+    "elencoPuntatoLatoFoto4" : "Prova4",
+    "elencoPuntatoLatoFoto5" : "Prova5",
+    "elencoPuntatoLatoFoto6" : "Prova6",
+
+    "pie_di_pagina" : "images/Piede_schede_tecniche_Sistem_air_Group1.jpg"
 
   }
    
