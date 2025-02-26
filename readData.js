@@ -2,16 +2,20 @@
 const { json, get, jsonp } = require('express/lib/response');
 const fs = require('fs');
 const { jsPDF } = require('jspdf');
-////
-const PDFDocument = require('pdfkit');
-////
+const { PDFDocument } = require('pdf-lib');
+
 const path = require('path');
 require('jspdf-autotable');
 const pdfPoppler = require('pdf-poppler');
-//const { content } = require('pdfkit/js/page');
 
-//var htot =  600;
-const wtot = 230;
+const ImageFactory = {
+    compress: (imageData) => {
+        // Simula la compressione 
+        console.log('Compressione immagine in corso...');
+        return imageData; 
+    }
+};
+const wtot = 290;
 
 fs.readFile('data1.json', 'utf8', (err, data) => {
     if (err) {
@@ -24,16 +28,17 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
         const jsonData = JSON.parse(data);
 
         //data
-        let y = 10 ; // Posizione iniziale verticale
+        let y = 10 ; 
         let y1 = y;
-         y += 10;
-        let x = 10; // Posizione iniziale orizzontale
+        y += 10;
+        let x = 10; 
 
         // get json data
         let azienda = jsonData.azienda;                     // azienda => dipende il template
         const piedipagina = jsonData.pie_di_pagina;
+        
+        let doc1 = new jsPDF(); 
 
-        if(azienda == '1'){
         const nomeProdotto = jsonData.nome;
         const numeroProdotto = jsonData.nomeProdotto;
         const testoLatoFoto = jsonData.descr;
@@ -43,12 +48,10 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
         const graficoLatoTabella1 = jsonData.graficoLatoTabella1;
         const graficoLatoTabella2 = jsonData.graficoLatoTabella2;
         const graficoSottoTabella = jsonData.graficoSottoTabella;
-        // costanti titoli
-        const titolo1 = "Principali Applicazioni";
-        const titolo2 = "Dati tecnici";
 
-        const headerTitles = {
-            "air_cloud": jsonData.air_cloud,
+        const headerTitles = { 
+            
+            "air_cloud": jsonData.air_cloud,   
             "alimentazione": jsonData.alimentazione,
             "alimentazione_prese": jsonData.alimentazione_prese,
             "altezza": jsonData.altezza,
@@ -109,22 +112,136 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             "valvola_rompivuoto_di_sicurezza": jsonData.valvola_rompivuoto_di_sicurezza,
         };
 
+        const headerTitles1 = { 
+            
+            "air_cloud": jsonData.air_cloud,   
+            "alimentazione": jsonData.alimentazione,
+            "alimentazione_prese": jsonData.alimentazione_prese,
+            "altezza": jsonData.altezza,
+            "assorbimento": jsonData.assorbimento,
+            "attacco_aspirazione_scarico": jsonData.attacco_aspirazione_scarico,
+            "capacita_bombola":jsonData.capacita_bombola
+        };
+        
+
         const testoSottoFoto = jsonData.princApp;
-            const testoSottoGrafico1 = jsonData.testoSottoGrafico1;
-            const titoloSottoGrafico1 = jsonData.titoloSottoGrafico1;
-            const titoloSottoGrafico2 = jsonData.titoloSottoGrafico2;
-            const titoloSottoGrafico3 = jsonData.titoloSottoGrafico3;
-            const titoloSottoGrafico4 = jsonData.titoloSottoGrafico4;
-            const titoloSottoGrafico5 = jsonData.titoloSottoGrafico5;
+        const testoSottoGrafico1 = jsonData.testoSottoGrafico1;
 
-            //tab
-            const headers = ["Parametro", "Valore"];                                            // Intestazione fissa
+        // costanti titoli
+        const titolo1 = "Principali Applicazioni";
+        const titolo2 = "Dati tecnici";
+        let titoloSottoGrafico1;
+        if(azienda == 1 ){
+            titoloSottoGrafico1 = "Grafico di prestazione";
+        }else{
+            if(azienda == 2){
+                titoloSottoGrafico1 = "Sequenza di monitoraggio";
+            }
+        }
+            
+        let titoloSottoGrafico3;
+        const titoloSottoGrafico2 = "Omologazioni";
+        if(azienda == '1'){
+            titoloSottoGrafico3 = "Conformità e normative";
+        }else{
+            if(azienda == '2'){
+                titoloSottoGrafico3 = "Consigli per la posa";
+            }
+        }
+        let titoloSottoGrafico4;
+        if(azienda == '1'){
+            titoloSottoGrafico4 = "Conformità";
+        }else{
+            if(azienda == '2'){
+                titoloSottoGrafico4 = "Prova di Carico";
+            }
+        }
+        let titoloSottoGrafico5;
+        if(azienda =='1'){
+            titoloSottoGrafico5 = "Normative armonizzate applicate";
+        }
+        else{
+            if(azienda=='2'){
+                titoloSottoGrafico5 = "Certificazioni";
+            }
+        }
 
-            const tableData = Object.entries(headerTitles).filter(([_,value])=>value)
-            .map(([key, value]) => [
-                key.replace(/_/g, " "),                                                         // sostituisce "_" con " "
-                value ? String(value) : key++                                                      // Converte tutti i valori in stringa per evitare errori
-            ]);
+        let headers = [];
+        if(azienda == '1'){
+            headers = ["Parametro", "Valore", "Unita"];
+        }
+        else{                
+            headers = ["Parametro", "Unita", "Descrizione", "Valore", "Sku"];
+        }
+        let suffixies =[];
+        suffixies = headers.map(header => 
+            header.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
+        );
+
+            // Aggiornato: Creazione dati tabella con dati in base agli headers
+            const tableData = Object.entries(headerTitles)
+            .filter(([_, value]) => value)
+                .map(([key, value]) => {
+                    const row = [];
+               
+                suffixies.forEach(suffix => {
+                    if(suffix == 'parametro')
+                        suffix = '';
+                    const colid = `${key}${suffix}`;             
+
+                    row.push(jsonData[colid] || "-");
+                });        
+                const isEmptyRow = row.every(cell => cell === "-" || cell === null || cell === "");
+                return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
+            })
+            .filter(row => row !== null); // Rimuove le righe vuote
+
+            //h righe
+            //
+            function calculateTableHeight(tableData,  fontSize, lineSpacing) {
+                let totaltableHeight = 0;
+            
+                tableData.forEach(row => {
+                    let maxRowHeight = 0;
+            
+                    row.forEach(cellText => {
+                        const textLines = doc1.splitTextToSize(cellText,50); // 50 = larghezza stimata
+                        const cellHeight = textLines.length  * (fontSize  * lineSpacing);
+                        console.log('altezza singola cella', cellHeight);
+                        maxRowHeight = Math.max(maxRowHeight, cellHeight);
+                        //totaltableHeight += maxRowHeight;
+                    });
+            
+                    totaltableHeight += maxRowHeight;
+                });
+            
+                return totaltableHeight;
+            }
+
+            console.log('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh1',calculateTableHeight(tableData, 8-2, 0.5));
+        
+            //
+
+                const tableData1 = Object.entries(headerTitles1)
+                .filter(([_, value]) => value)
+                    .map(([key, value]) => {
+                        const row = [];
+                   
+                    suffixies.forEach(suffix => {
+    
+                        if(suffix == 'parametro')
+                            suffix = '';
+                        const colid = `${key}${suffix}`;
+                        //console.log(`Looking for: ${colid}`);
+                        row.push(jsonData[colid] || "-");
+                    });        
+                    const isEmptyRow = row.every(cell => cell === "-" || cell === null || cell === "");
+                    return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
+                })
+                .filter(row => row !== null); // Rimuove le righe vuote
+                    //console.log(tableData1);
+                    console.log('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh',calculateTableHeight(tableData1, 8-2,0.5));
+
 
             let elencop1 = [];
             let i = 1;
@@ -203,100 +320,88 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             }
             n4 = iend4 - istart4;
             console.log('n4',n4);
-
-            /*let elencoCol = [];
-            for(let i=1; i < 5; i++){
-                elencoCol[i] = jsonData[`colTab${i}`]
-            }*/
             let carLenght = 0;
             let carosello = [];
             const maxPhoto = 9;
             for(let i = 0; i < maxPhoto; i++){
                 if(jsonData[`carosello${i}`] ){
                     carosello[i] = jsonData[`carosello${i}`]; 
-                    console.log(carosello[i]);
+                    //console.log(carosello[i]);
                     carLenght = i; 
-
-                    
                 }
             }
-
-
-
-            //space
-            let doc1 = new jsPDF(); 
+            //spaces
+            let spacetab1 = calculateTableHeight(tableData,  8-2,0.5);
+            let spacetab2 = calculateTableHeight(tableData1, 8-2,0.5);
             let space1 = 6;
             let space2 = 10;
             let space3 = 3;
             let space4 = 35;
             let space5 = 5;
-            let space5_1 = space5 * n1;
+            let space5_1 = space5 * (n1+1);
             let space6 = 7;
+            let hgr1 = 40;
             let hPhoto = 65;
             let wPhoto = 65;
-            let spacef = 5;
+            let spacef = 5*(n1+1);
             let space7 = doc1.getTextDimensions(titolo1).h + 5;
             let space8 = space7 +  doc1.getTextDimensions(testoSottoFoto).h + 25;
             let cimgy = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
+            let cimgy1 = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
             let d1 = ( (wtot - (y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8) ) / carLenght)/4;
             let wtottemp = ( (wtot - (space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8) ) /carLenght)/4;
             let cimgw = ( ( (wtot/carLenght) *3)/4);
+            let cimgw1 =( ( (wtot/carLenght) *3)/4);
             let cimgh = (cimgw*1.5)/2;
+            let cimgh1 = cimgw1;
+            let hgr2 = cimgh + 10;
             let space9 =  doc1.getTextDimensions(testoSottoFoto).h; // + 10;
+            let space9_a = doc1.getTextDimensions(testoSottoFoto).h * 2;
+            let space9_a1 = (doc1.getTextDimensions(testoSottoFoto).h + cimgh1)* 2;
+            let spaceimg1 = 5;
             let space10 = doc1.getTextDimensions(titolo2).h;
-            //let space11 = Math.ceil(doc1.lastAutoTable.finalY)+10; 
             let space12 = 9;
             let space13 = doc1.getTextDimensions(titoloSottoGrafico1).h;
             let space14 = 5;
             let space15 = 9;
-            let space15_1 = space15 * n2;
+            let space15_1 = space15 * (n2+1);
             let space16 = 5 + doc1.getTextDimensions(titoloSottoGrafico3).h;
             let space17 = 15 + doc1.getTextDimensions(testoSottoGrafico1).h;
             let space18 =  5 + doc1.getTextDimensions(testoSottoGrafico1).h;
             let space19 = 7;
-            let space19_1 = space19 * n3;
+            let space19_1 = space19 * (n3+1);
             let space20 = 5;
             let space21 = 5 + doc1.getTextDimensions(testoSottoGrafico1).h;
             let space22 = 7;
-            let space22_1 = space22 * n4;
+            let space22_1 = space22 * (n4+1);
             let space23 = 3;
             let space24 =  doc1.getTextDimensions(testoSottoGrafico1).h + 10;
             const footerHeight = 50; // Altezza del piè di pagina
 
-            y1 = y1 + cimgy + hPhoto + footerHeight + space24 +  space1 + space2 + space3 + space4 + space5_1 + space6 + space7 + space8 + space9 + space10 + space12 + space13 + space14 + space15_1 + space16 + space17 + space18 + space19_1 + space20 + space21 + space22_1 + space23 + space24;
+            if(azienda == '1'){
+                y1 = y1 + /*cimgy +*/ hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
+                        + space7 + space8 + space9 + spacetab1 + space10  + space12 + space13 + space14  + space15_1 
+                        + space16 + space17 + space18 +  space19_1 + space20 + space21  + space22_1 ;
+                        
+            }else{
+                if(azienda == '2'){
+                    y1 = y1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
+                            + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16 + space17 + space18 + spacetab2
+                            + space21 + space21 + space21 + space22_1  + (space9+10);
+            
+                }
+            }
             
             let footerY = y1 ; // Posizione verticale
             console.log('y1', y1, footerY);
-            const htot = y1 + footerHeight;
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            const htot = y1; // + footerHeight;
 
         let doc = new jsPDF({
             orientation: "portrait",        // "landscape" per orizzontale
             unit: "mm",                     // Unità di misura ("mm", "cm", "in", "px")
-            format: [wtot, htot-10]              // Larghezza e altezza personalizzate in mm
-            
-        });
-
-        
-            
-            
-                        // per conversione pdf jpg
-                        /*let graficoSottoTabella_p = graficoSottoTabella.split("/")[1];
-                        const outputDir = "images";
-                        const outputImage = path.join(outputDir,  path.extname(graficoSottoTabella_p));
-            
-                        const opts = {
-                            format: 'jpeg',
-                            out_dir: outputDir,
-                            out_prefix: path.basename(graficoSottoTabella_p, path.extname(graficoSottoTabella_p)),
-                            page: 1 // Converte solo la prima pagina del PDF
-                        };
-            
-                        //controllo esistenza cartella otput
-                        if (!fs.existsSync(outputDir)) {
-                            fs.mkdirSync(outputDir, { recursive: true });
-                        }
-                        */
+            //format: [wtot, htot-10]         // Larghezza e altezza personalizzate in mm
+            format: [wtot, y1]
+        });           
         
             // nome prodotto
             doc.setFontSize(25);
@@ -306,40 +411,30 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             // numero articolo (prodotto)
             doc.setFontSize(15)
             doc.setFont("helvetica", "normal");
-            //let space1 = 6;
             y += space1;
             doc.text(numeroProdotto, x, y);
 
             //logo
             if (logo && fs.existsSync(logo)) {
                 const imageData = fs.readFileSync(logo).toString('base64');
-                doc.addImage(imageData, 'JPEG', 150, 5, 35, 10);            
+                doc.addImage(imageData, 'JPEG', wtot-45, 5, 35, 10);            
             }        
-            //let space2 = 10;
-            y += space2; // Spazio sotto il titolo
+            y += space2;
 
             // foto prodotto
-            //let hPhoto = 65;
-            //let wPhoto = 65;
-            //let spacef = 5;
             if (fotoprodotto && fs.existsSync(fotoprodotto)) {
                 const imageData = fs.readFileSync(fotoprodotto).toString('base64');
                 doc.addImage(imageData, 'JPEG', 10, y, wPhoto, hPhoto);
             }
             let xleftPhoto = x + 75;
-            //let space3 = 3;
             let yleftPhoto = y + space3;
 
             // Testo lato foto 
             doc.setFontSize(8);
-            doc.text(testoLatoFoto, xleftPhoto, yleftPhoto, { maxWidth: 120 , maxDataLength: 700});
-            // doc.text(testoLatoFoto, xleftPhoto, yleftPhoto, { maxWidth: 700 });
-            ///y += 40;
+            doc.text(testoLatoFoto, xleftPhoto, yleftPhoto, { maxWidth: wtot -100 });
             console.log(doc.getTextDimensions(testoLatoFoto).h);
-            //let space4 = 35;
             y = y  + space4 ;
             // Elenco puntato lato alla foto
-            //let space5 = 5;
             for (let i = 1; i <= 6; i++) {
                 if (elencop1[i]) {
                     doc.setFontSize(8);
@@ -348,75 +443,63 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                     hPhoto += spacef; 
                 }
             }
-            //let space6 = 7;
-            y = hPhoto + space6 + 10;        //altezza foto + 17
+            //y = hPhoto;// + space6 + 10;   
+            y += space6;     
 
             // titolo        
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text(titolo1, x, y );
             
-            //let space7 = doc.getTextDimensions(titolo1).h ;//+ 5;
             y = y  + space7;
 
             // Testo sotto foto 
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text(testoSottoFoto, x, y, { maxWidth: 195 });
-            //let space8 = 15 + doc.getTextDimensions(testoSottoFoto).h;//y += 15;
+            doc.text(testoSottoFoto, x, y, { maxWidth: wtot - 20 });
             y = y +  space8;
 
-            // conto quante foto nel carosello (max 8)
-            let cimgx = x;
-            //let cimgy = y; //let cimgy = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
-            //let cimgw = 0;
-            //let cimgh = 0;
-            console.log('questo valore qua', y);
-            //let wtottemp = wtot - y; /// let wtottemp = ( (wtot - (space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8) ) <7carLenght)/4;
-            console.log('wtottemp', wtottemp);
-            let d = ( wtottemp/carLenght )/ 4; // un quarto dello spazio singolo è l'intervallo
-            console.log('d', d1);
-            //  foto carosello
-            // cimgw = ( ( (wtot/carLenght) *3)/4);
-            // cimgh = (cimgw*1.5)/2;
             
-            console.log('n', carLenght, i);
-            for(let ic = 0; ic <=carLenght; ic++){
-                if(carosello[ic] && fs.existsSync(carosello[ic])){
-                    var imgCar = fs.readFileSync(carosello[ic]).toString('base64');
-                    doc.addImage(imgCar, 'JPEG', cimgx, cimgy, cimgw, cimgh);                    
-                // aumento x dopo ogni img
-                    cimgx += cimgw + d1;
+            let cimgx = x;
+            let cimgx1 = x;
+            if(azienda == '1'){
+                console.log('d', d1);
+                //  foto carosello            
+                console.log('n', carLenght, i);
+                for(let ic = 0; ic <=carLenght; ic++){
+                    if(carosello[ic] && fs.existsSync(carosello[ic])){
+                        var imgCar = fs.readFileSync(carosello[ic]).toString('base64');
+                        doc.addImage(imgCar, 'JPEG', cimgx, cimgy, cimgw, cimgh);                    
+                    // aumento x dopo ogni img
+                        cimgx += cimgw + d1;
+                    }
+                }
+                y = y + space9; 
+            }else{
+                if(azienda == '2'){
+                for(let ic1 = 0; ic1 <=carLenght; ic1++){
+                    if(cimgx1 >= (wtot-20)/2){
+                        cimgx1 = cimgx;
+                        cimgy1 = cimgy1 + cimgh1 + spaceimg1; 
+                    }
+                    if(carosello[ic1] && fs.existsSync(carosello[ic1])){
+                        var imgCar = fs.readFileSync(carosello[ic1]).toString('base64');
+                        doc.addImage(imgCar, 'JPEG', cimgx1, cimgy1, cimgw1, cimgh1);                    
+                    // aumento x dopo ogni img
+                        cimgx1 += cimgw1 + d1;
+                    }
+                }
+                y = y+ cimgh1 + space9_a;
                 }
             }
-            
-            //y += 7;
-            //y = y +  doc.getTextDimensions(titolo1).h;
-            //let space9 = d + cimgh + doc.getTextDimensions(testoSottoFoto).h + 10; //-------------DEVO PORTARE SU ACNHE d
-            y = y + space9;  //altezza immagini
-
+            y += 5;
             //titolo sopra tabella
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text(titolo2, x, y);
-
-            //y += 2,5;
-            //let space10 = doc.getTextDimensions(titolo2).h;
             y = y +  space10;
-            
 
-            /*const headers = ["Parametro", "Valore"];                                            // Intestazione fissa
-
-            const tableData = Object.entries(headerTitles).filter(([_,value])=>value)
-            .map(([key, value]) => [
-                key.replace(/_/g, " "),                                                         // sostituisce "_" con " "
-                value ? String(value) : key++                                                      // Converte tutti i valori in stringa per evitare errori
-            ]);*/
-
-            const marginLeft = 10;
-            const marginRight = 10;
-            const pageWidth = doc.internal.pageSize.width - marginLeft - marginRight;
-            const pageHeight = htot;        
+            const marginLeft = 10;       
             let maxDataWidth = 0;
             let  cellWidth = 0;
             let maxw = 0;
@@ -424,28 +507,27 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             // Funzione per calcolare larghezza massima delle colonne
             function getOptimalColumnWidths(headers, tableData, doc) {
                 return headers.map((header, colIndex) => {
-                    // titolo della colonna (header)
-                    const headerWidth = doc.getTextWidth(header);            
-                    // larghezza massima dei dati nella colonna 
+                    const headerWidth = doc.getTextWidth(header);           // larghezza massima dei dati nella colonna 
                     maxDataWidth = tableData.reduce((max, row) => {
-                        cellWidth = doc.getTextWidth(row[colIndex] || ""); // Se cella vuota, usa stringa vuota
+                        cellWidth = doc.getTextWidth(row[colIndex] || "");  // Se cella vuota, usa stringa vuota
                         return Math.max(max, cellWidth);
                     }, 0);            
-                    maxw = Math.max(headerWidth, maxDataWidth);
-                    return Math.max(headerWidth, maxDataWidth);
+                    maxw = Math.max(headerWidth-10, maxDataWidth-40);       //return Math.max(headerWidth-10, maxDataWidth-40);
+                    return maxw;
                 });
             }
-            
-            
-            /////////            
-
             // Calcola le larghezze ottimali per le colonne
-            const columnWidths = getOptimalColumnWidths(headers, tableData, doc); //, pageWidth);
-            
+            const columnWidths = getOptimalColumnWidths(headers, tableData, doc);      
+            const tableWidth = columnWidths.reduce((totalWidth, width) => totalWidth + width, 0);
 
+            console.log('y prima di tabDat: ', y);
+            //doc.text('prima la tab1)', x ,y);
+                
             doc.autoTable({
                 startY: y,                                          // Posizione della tabella
-                margin: { left: marginLeft, right: maxw },
+                margin: { left: marginLeft, right: maxw},
+                tableWidth: tableWidth,
+                //maxWidth: wtot-100,
                 head: [headers],
                 body: tableData,
                 styles: {
@@ -474,19 +556,23 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 }, {}),
                 tableLineColor: [0, 0, 0],                          // Colore dei bordi (nero)
                 tableLineWidth: 0.1,                                // Larghezza del bordo
-                didDrawPage: function (data) {
+                /*didDrawPage: function (data) {
                     // Se lo spazio della pagina è esaurito, aggiunge una nuova pagina
                     if (data.cursor.y > pageHeight) {
                         doc.addPage();
                     }
+                }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////111
+               didDrawCell: function(data){
+                if(data.section === 'body'){
+                    console.log(`riga ${data.row.index} h ${data.cell.height}`);
                 }
+               }*/
             }); 
-
-                const tableWidth = columnWidths.reduce((totalWidth, width) => totalWidth + width, 0);
-                const xT = marginLeft + tableWidth + 10; 
+            const xT = marginLeft + tableWidth + 2.5; 
 
                 x += xT;
-
+                console.log('y dopo di tabDat: ', doc.lastAutoTable.finalY);
+                //doc.text('dopo la tab1',x,doc.lastAutoTable.finalY);
                 //graficoLatoTabella
                 let space   = (Math.ceil(doc.lastAutoTable.finalY)/6);
                 let xGr     =  25;
@@ -509,23 +595,235 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
 
                 //agg. coordinate
                 x = 10;
-                //let space12 = 9;
-                //y += space12;
                 let diff = 105;
 
                 doc.setFontSize(12);
                 doc.setFont("helvetica", "bold");
                 doc.text(titoloSottoGrafico1, x, y, { maxWidth: 200 });
                 diff = x + diff;
-                doc.text(titoloSottoGrafico2, diff, y, { maxWidth: 200 });
-                //let space13 = doc.getTextDimensions(titoloSottoGrafico1).h;
+                if(azienda =='1')
+                    doc.text(titoloSottoGrafico2, diff, y, { maxWidth: 200 });
                 y = y + space13;
 
-                // "grafico" 
-                
+                // "grafico"                 
                 doc.setFontSize(10);
+                let hGr = 60;
                 let wGr = 60;
-                let hGr = 40;
+                /*if(azienda == '1'){
+                    hGr = 40;
+                }else{
+                    if(azienda == '2'){
+                        hGr = cimgh+10;
+                    }
+                }*/
+                if(azienda == '1'){
+                    hGr = 40;
+                    if (graficoSottoTabella && fs.existsSync(graficoSottoTabella)) {
+                        const imageData = fs.readFileSync(graficoSottoTabella).toString('base64');
+                        doc.addImage(imageData, 'JPEG', x, y, hGr, wGr);
+                    }
+                
+                
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    //elenco puntato lato grafico
+                    y += space14;
+                        for(let j = 0; j<4; j++){
+                            
+                            if (jsonData[`elencoPuntatoLatoGrafico${j}`]) {
+                                doc.text(`• ` + elencop2[j], diff , y);
+                                y += space15;
+                            }
+                        }
+                }
+            
+
+                if(azienda == '2'){
+                    hGr = cimgh+10;
+                    console.log('d', d1);
+                    cimgx = x;
+                    cimgy = y;
+                    //  foto carosello            
+                    console.log('n', carLenght, i);
+                    for(let ic = 0; ic <=carLenght; ic++){
+                        if(carosello[ic] && fs.existsSync(carosello[ic])){
+                            var imgCar = fs.readFileSync(carosello[ic]).toString('base64');
+                            doc.addImage(imgCar, 'JPEG', cimgx, cimgy, cimgw, cimgh);                    
+                        // aumento x dopo ogni img
+                            cimgx += cimgw + d1;
+                        }
+                    }                    
+                }
+
+                y += hGr;
+                //titolo sotto grafico
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12);
+                doc.text(titoloSottoGrafico3, x, y, { maxWidth: 200 });
+                
+                doc.setFontSize(9);
+                y += space16;
+                doc.setFont("helvetica", "normal");
+                doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
+
+                if(azienda == '2'){
+                let y2 = y + 10; 
+                y =  y2+ space9;
+                    for(let j = 0; j<7; j++){
+                        
+                        if (jsonData[`elencoPuntatoLatoGrafico${j}`]) {
+                            doc.text(`• ` + elencop2[j], x , y2);
+                            y2 += 4;
+                        }
+                    }
+                }
+            
+                y = y + space17;
+                            
+                //titolo sotto grafico 2
+                doc.setFont("helvetica", "bold");
+                doc.text(titoloSottoGrafico4, x, y , { maxWidth: 200 });
+                y += space18;
+                doc.setFont("helvetica", "normal");
+
+                //elencoPuntatoSottoGrafico    
+                if(azienda == '1'){
+                    for(let j = 4; j<7; j++){
+                        if (elencop3[j]) {
+                            doc.text(`• ` + elencop3[j], x, y);
+                            y += space19;
+                        }
+                    }
+                    
+                y += space20 ;
+
+                }else{
+                    if(azienda == '2'){
+                        //doc.text('PRIMA la tab2)',x,y);
+                        console.log('y prima di tabDat1: ', y);
+                       /* const tableData1 = Object.entries(headerTitles1)
+                        .filter(([_, value]) => value)
+                            .map(([key, value]) => {
+                                const row = [];
+                           
+                            suffixies.forEach(suffix => {
+            
+                                if(suffix == 'parametro')
+                                    suffix = '';
+                                const colid = `${key}${suffix}`;
+                                //console.log(`Looking for: ${colid}`);
+                                row.push(jsonData[colid] || "-");
+                            });        
+                            const isEmptyRow = row.every(cell => cell === "-" || cell === null || cell === "");
+                            return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
+                        })
+                        .filter(row => row !== null); // Rimuove le righe vuote
+                            console.log(tableData1);*/
+                        
+                        doc.autoTable({
+                            startY: y,                                          // Posizione della tabella
+                            margin: { left: marginLeft, right: maxw },
+                            tableWidth: tableWidth,
+                            head: [headers],
+                            body: tableData1,
+                            styles: {
+                                fontSize: 8,
+                                cellPadding: 0.2,                                 // Margine interno delle celle
+                                overflow: 'linebreak',                          // Gestisce l'overflow con interruzioni di riga
+                                halign: 'left',                                 // Allineamento orizzontale
+                                valign: 'middle',                               // Allineamento verticale
+                            },
+                            headStyles: {
+                                fillColor: [200, 200, 200],                    // Colore di riempimento per l'intestazione
+                                textColor: [0, 0, 0],                          // Colore del testo per l'intestazione
+                            },
+                            bodyStyles: {
+                                fillColor: [255, 255, 255],                    // Colore di riempimento per il corpo (bianco)
+                                textColor: [0, 0, 0],                          // Colore del testo per il corpo
+                                lineWidth: 0.01,                                // Larghezza dei bordi
+                                lineColor: [0, 0, 0],                          // Colore dei bordi (nero)
+                            },
+                            columnStyles: headers.reduce((styles, header, index) => {
+                                styles[index] = {
+                                    cellWidth: columnWidths[index],
+                                    fontStyle: index === 0 ? 'bold' : 'normal'  // Grassetto per la prima colonna
+                                };
+                                return styles;
+                            }, {}),
+                            tableLineColor: [0, 0, 0],                          // Colore dei bordi (nero)
+                            tableLineWidth: 0.1,                                // Larghezza del bordo
+                            /*didDrawPage: function (data) {
+                                // Se lo spazio della pagina è esaurito, aggiunge una nuova pagina
+                                if (data.cursor.y > pageHeight) {
+                                    doc.addPage();
+                                }
+                            }*/
+                        }); 
+                        y = Math.ceil(doc.lastAutoTable.finalY)+10;
+            
+                    }
+                }
+
+                //doc.text('DOPO la tabella)',x,doc.lastAutoTable.finalY);
+                console.log('y dopo di tabDat1: ', y);
+
+                doc.setFont("helvetica", "normal");
+                if(azienda == '2'){
+                    
+                doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
+                y = y + space21;
+                }
+                //titolo sotto grafico 2                
+                doc.setFont("helvetica", "bold");
+                doc.text(titoloSottoGrafico5, x, y, { maxWidth: 200 });
+                y = y + space21;
+                doc.setFont("helvetica", "normal");
+
+                if(azienda == '2'){
+                    doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
+                    y = y + space21;
+                }
+
+                y += space23;
+
+                for(let j = 8; j<12; j++){
+                    if (elencop4[j]) {
+                        doc.text(`• ` + elencop4[j], x, y);
+                        y += space22;
+                    }
+                }
+                //testo sotto grafico 2
+                doc.setFontSize(7);
+                doc.text(testoSottoGrafico1, x, y);//, { maxWidth: 200 });
+
+                console.log('y finale: ', y);
+                console.log('y1 totale: ', y1);
+
+            doc.setTextColor(255, 255, 255); // Colore bianco per il testo
+            doc.setFontSize(10);
+           
+            /**
+             * stampa pie di pagina
+            if (piedipagina && fs.existsSync(piedipagina)) {
+                const imgData = jsonData.pie_di_pagina;
+                
+                doc.addImage(imgData, 'JPEG', 0, footerY, wtot, footerHeight/2);            
+            }*/
+        
+
+
+            doc.save('provaPdf.pdf');
+            console.log(`✅ PDF salvato `);
+            //console.log(`✅ PDF salvato su: ${pdfPath}`);
+           // }
+
+        } catch (error) {
+            console.error("Errore nel parsing del JSON:", error);
+        }
+});
+
+
+
 
                 // Converte il PDF in immagine --- DA RIVEDERE
                 /*pdfPoppler.convert(graficoSottoTabella_p, opts)
@@ -556,235 +854,3 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                     .catch(err => {
                         console.error("Errore nella conversione:", err);
                     });*/
-
-                if (graficoSottoTabella && fs.existsSync(graficoSottoTabella)) {
-                    const imageData = fs.readFileSync(graficoSottoTabella).toString('base64');
-                    doc.addImage(imageData, 'JPEG', x, y, hGr, wGr);
-                }
-            
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(10);
-                //elenco puntato lato grafico
-                //let space14 = 5; // SERVE ANCHE hGr
-                y += space14;
-                //let space15 = 9;
-                for(let j = 0; j<4; j++){
-                    
-                    if (jsonData[`elencoPuntatoLatoGrafico${j}`]) {
-                        doc.text(`• ` + elencop2[j], diff , y);
-                        y += space15;
-                    }
-                }
-
-                y = hGr + y ;
-                //titolo sotto grafico
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(12);
-                doc.text(titoloSottoGrafico3, x, y, { maxWidth: 200 });
-                
-                doc.setFontSize(10);
-                //let space16 = 5 + doc.getTextDimensions(titoloSottoGrafico3).h;
-                y = y + space16;
-                doc.setFont("helvetica", "normal");
-                //testo vicino "grafico (foto2)"   
-                doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
-                //elencoPuntatoSottoGrafico
-                //let space17 = 15 + doc.getTextDimensions(testoSottoGrafico1).h;
-                y = y + space17;
-                //y = y + doc.getTextDimensions(testoSottoGrafico1).h;
-                //titolo sotto grafico 2
-                doc.setFont("helvetica", "bold");
-                doc.text(titoloSottoGrafico4, x, y, { maxWidth: 200 });
-                //let space18 =  5 + doc.getTextDimensions(testoSottoGrafico1).h;
-                y = y + space18;
-                doc.setFont("helvetica", "normal");
-
-                //let space19 = 7;
-                for(let j = 4; j<7; j++){
-                    if (elencop3[j]) {
-                        doc.text(`• ` + elencop3[j], x, y);
-                        y += space19;
-                    }
-                }
-                //let space20 = 5;
-                y += space20;
-
-                //titolo sotto grafico 2                
-                doc.setFont("helvetica", "bold");
-                doc.text(titoloSottoGrafico5, x, y, { maxWidth: 200 });
-                //let space21 = 5 + doc.getTextDimensions(testoSottoGrafico1).h;
-                y = y + space21;
-                doc.setFont("helvetica", "normal");
-                //y += 10;
-                //let space22 = 7;
-
-                for(let j = 8; j<12; j++){
-                    if (elencop4[j]) {
-                        doc.text(`• ` + elencop4[j], x, y);
-                        y += space22;
-                    }
-                }
-                
-                y += space23;
-
-                //testo sotto grafico 2
-                doc.setFontSize(7);
-                doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
-
-        //} --end azienda
-
-            // Salva il PDF sul Desktop 
-            // [funziona] const pdfPath = path.join(desktopPath, 'provaDowloadPDF.pdf');
-            // doc.save(pdfPath);
-
-            // Footer
-            // const footerHeight = 15; // Altezza del piè di pagina
-            // const footerY = doc.internal.pageSize.height - footerHeight; // Posizione verticale
-            // let space24 = doc.getTextDimensions(testoSottoGrafico1);
-            //footerY += space24;
-            //doc.setFillColor(50, 50, 50); // Imposta il colore di sfondo (grigio scuro)
-            //doc.rect(0, footerY, doc.internal.pageSize.width, footerHeight, 'F'); // Disegna il rettangolo
-            
-            footerY += space24;
-            // Aggiungi il testo del piè di pagina
-            doc.setTextColor(255, 255, 255); // Colore bianco per il testo
-            doc.setFontSize(10);
-            //doc.text("Piè di pagina", 10, footerY);
-            
-            // Copia i contenuti dal vecchio PDF al nuovo
-            // newDoc.addImage(doc.output("datauristring"), "JPEG", 0, 0, wtot, 800);
-           
-            /**
-             * stampa pie di pagina
-            */
-            if (piedipagina && fs.existsSync(piedipagina)) {
-                const imageData = fs.readFileSync(piedipagina).toString('base64');
-        //const piedipagina = jsonData.piedipagina;
-                doc.addImage(imageData, 'JPEG', 0, footerY, wtot, footerHeight/2);            
-            }  
-    
-             
-
-
-            
-            doc.save('provaPdf.pdf');
-            console.log(`✅ PDF salvato `);
-            //console.log(`✅ PDF salvato su: ${pdfPath}`);
-            }
-
-        } catch (error) {
-            console.error("Errore nel parsing del JSON:", error);
-        }
-});
-
-
-//VECCHI TABELLA
-
-        /*const tableData = [
-            ['Sezione', 'Valore', 'va1', 'val2', 'val3'],
-            ['Testo ', jsonData.testoSottoGrafico2,  jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2,  jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2,  jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2,  jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2,  jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2,  jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2,  jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1],
-            ['Testo ', jsonData.testoSottoGrafico2, jsonData.elencoPuntatoLatoGrafico3,  jsonData.elencoPuntatoLatoGrafico2, jsonData.elencoPuntatoLatoGrafico1]
-        ]; 
-        doc.autoTable({
-            startY: y,
-            margin: { left: 10 },
-            head: [tableData[0]],
-            tableWidth: 100,
-            cellPadding: 1,
-            body: tableData.slice(1),
-            styles: { 
-                fontSize: 10, 
-                cellPadding: 3, 
-                textColor: [0, 0, 0], // Testo nero per il corpo
-                lineColor: [0, 0, 0], // Bordi neri evidenti
-                lineWidth: 0.1, // Spessore del bordo
-                cellPadding: 0.5
-            },
-            headStyles: { 
-                fillColor: [220, 220, 220], // Sfondo azzurro per l'header
-                textColor: [0, 170, 255], // Testo azzurro per l'header
-                lineColor: [0, 0, 0], // Bordi neri per l'header
-                lineWidth: 0.1, // Spessore del bordo dell'header
-                cellPadding: 0.5
-            },
-            bodyStyles: { 
-                fillColor: [255, 255, 255], // Sfondo bianco per tutto il corpo
-                textColor: [0, 0, 0], // Testo nero per il corpo
-                cellPadding: 0.5
-            },
-            alternateRowStyles: { fillColor: [255, 255, 255] }, // Forza tutte le righe a essere bianche
-        });*/
-
-
-                    // Tabella             
-            /*const headers = Object.keys(jsonData.tabella[0]); // Intestazioni dinamiche
-                const tableData = jsonData.tabella.map(row => headers.map(header => row[header] || ""));
-
-                // Funzione per calcolare la larghezza massima di ciascuna colonna
-                function getMaxColumnWidths(headers, tableData, doc) {
-                    const columnWidths = headers.map((header, index) => {
-                        // Calcola la lunghezza massima del contenuto per ogni colonna
-                        const headerLength = doc.getTextWidth(header);
-                        const maxDataLength = tableData.reduce((max, row) => {
-                            const cellLength = doc.getTextWidth(row[index]);
-                            return Math.max(max, cellLength);
-                        }, 0);
-                        return Math.max(headerLength, maxDataLength) + 10; // Aggiungi un po' di padding
-                    });
-                    return columnWidths;
-                }*/
-
-            // Impostazioni per margini e larghezza
-            // const marginLeft = 10;
-            // const marginRight = 10;
-            // const headerHeight = 10;
-            // const rowHeight = 8;
-
-                        // Impostare il layout della tabella
-            /*doc.autoTable({
-                startY: y,                                          // Posizione della tabella
-                margin: { left: marginLeft, right: marginRight },
-                head: [headers], 
-                body: tableData, 
-                styles: {
-                    fontSize: 8,               
-                    cellPadding: 3,                                 // Margine interno delle celle
-                    overflow: 'linebreak',                          // Gestisce l'overflow con interruzioni di riga
-                    halign: 'center',                               // centrato orizzontale 
-                    valign: 'middle'                                // centrato verticale 
-                },
-                columnStyles: headers.reduce((styles, header, index) => {
-                    styles[index] = { cellWidth: columnWidths[index] };
-                    return styles;
-                }, {}),
-                headStyles: {
-                    fillColor: [200, 200, 200], 
-                    textColor: [0, 0, 0], 
-                },
-                bodyStyles: {
-                    fillColor: [255, 255, 255], 
-                    textColor: [0, 0, 0], 
-                },
-            });*/
