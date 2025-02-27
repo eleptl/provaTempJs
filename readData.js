@@ -340,106 +340,106 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
         n3 = iend3 - istart3;
         console.log('n3', n3);
 
-        let elencop4 = [];
-        let i4 = 8;
-        let j4 = i4 + 1;
-        let istart4 = j4;
-        let iend4 = 0;
-        let n4 = 0;
-        for (i4; i4 < j4; i4++) {
-            iend4 = j4;
-            if (jsonData[`elencoPuntatoSottoGrafico${i4}`]) {
-                elencop4[i4] = jsonData[`elencoPuntatoSottoGrafico${i4}`];
-                j4 += 1;
+            let elencop4 = [];
+            let i4 = 8;
+            let j4 = i4 + 1;
+            let istart4 = j4;
+            let iend4 = 0;
+            let n4 = 0;
+            for(i4; i4 < j4; i4++){
+                iend4 = j4;
+                if(jsonData[`elencoPuntatoSottoGrafico${i4}`]){
+                    elencop4[i4] = jsonData[`elencoPuntatoSottoGrafico${i4}`];
+                    j4 += 1;
+                }
+                else{
+                    j4 -= 1;
+                }
             }
-            else {
-                j4 -= 1;
+            n4 = iend4 - istart4;
+            console.log('n4',n4);
+            let carLenght = 0;
+            let carosello = [];
+            const maxPhoto = 9;
+            for(let i = 0; i < maxPhoto; i++){
+                if(jsonData[`carosello${i}`] ){
+                    carosello[i] = jsonData[`carosello${i}`]; 
+                    //console.log(carosello[i]);
+                    carLenght = i; 
+                }
             }
-        }
-        n4 = iend4 - istart4;
-        console.log('n4', n4);
-        let carLenght = 0;
-        let carosello = [];
-        const maxPhoto = 9;
-        for (let i = 0; i < maxPhoto; i++) {
-            if (jsonData[`carosello${i}`]) {
-                carosello[i] = jsonData[`carosello${i}`];
-                //console.log(carosello[i]);
-                carLenght = i;
-            }
-        }
-        //spaces
-        let spacetab1 = calculateTableHeight(tableData, fontCalc, lineSpacCalc);
-        let yGr1 = (spacetab1 / 6.5) * 2 + 10;
-        let spacetab2 = calculateTableHeight(tableData1, fontCalc, lineSpacCalc);
-        let space1 = 6;
-        let space2 = 10;
-        let space3 = 3;
-        let space4 = 35;
-        let space5 = 5;
-        let space5_1 = space5 * (n1 + 1);
-        let space6 = 7;
-        let hgr1 = 40;
-        let hPhoto = 65;
-        let wPhoto = 65;
-        let spacef = 5 * (n1 + 1);
-        let space7 = doc1.getTextDimensions(titolo1).h + 5;
-        let space8 = space7 + doc1.getTextDimensions(testoSottoFoto).h + 25;
-        let cimgy = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
-        let cimgy1 = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
-        let d1 = ((wtot - (y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8)) / carLenght) / 4;
-        let wtottemp = ((wtot - (space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8)) / carLenght) / 4;
-        let cimgw = (((wtot / carLenght) * 3) / 4);
-        let cimgw1 = (((wtot / carLenght) * 3) / 4);
-        let cimgh = (cimgw * 1.5) / 2;
-        let cimgh1 = cimgw1;
-        let hgr2 = cimgh + 10;
-        let space9 = doc1.getTextDimensions(testoSottoFoto).h; // + 10;
-        let space9_a = doc1.getTextDimensions(testoSottoFoto).h * 2;
-        let space9_a1 = (doc1.getTextDimensions(testoSottoFoto).h + cimgh1) * 2;
-        let spaceimg1 = 5;
-        let space10 = doc1.getTextDimensions(titolo2).h;
-        let space12 = 9;
-        let space13 = doc1.getTextDimensions(titoloSottoGrafico1).h;
-        let space14 = 5;
-        let space15 = 9;
-        let space15_1 = space15 * (n2 + 1);
-        let space16 = 5 + doc1.getTextDimensions(titoloSottoGrafico3).h;
-        let space17 = 15 + doc1.getTextDimensions(testoSottoGrafico1).h;
-        let space18 = 5 + doc1.getTextDimensions(testoSottoGrafico1).h;
-        let space19 = 7;
-        let space19_1 = space19 * (n3 + 1);
-        let space20 = 5;
-        let space21 = 5 + doc1.getTextDimensions(testoSottoGrafico1).h;
-        let space22 = 7;
-        let space22_1 = space22 * (n4 + 1);
-        let space23 = 3;
-        let space24 = doc1.getTextDimensions(testoSottoGrafico1).h + 10;
-        const footerHeight = 50; // Altezza del piè di pagina
+            //spaces
+            let spacetab1 = calculateTableHeight(tableData,  fontCalc,lineSpacCalc);
+            let yGr1 =( spacetab1 / 6.5)*2 + 35;
+            let spacetab2 = calculateTableHeight(tableData1, fontCalc,lineSpacCalc);
+            let space1 = 6;
+            let space2 = 10;
+            let space3 = 3;
+            let space4 = 35;
+            let space5 = 5;
+            let space5_1 = space5 * (n1+1);
+            let space6 = 7;
+            let hgr1 = 40;
+            let hPhoto = 65;
+            let wPhoto = 65;
+            let spacef = 5*(n1+1);
+            let space7 = doc1.getTextDimensions(titolo1).h + 5;
+            let space8 = space7 +  doc1.getTextDimensions(testoSottoFoto).h + 25;
+            let cimgy = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
+            let cimgy1 = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
+            let d1 = ( (wtot - (y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8) ) / carLenght)/4;
+            let wtottemp = ( (wtot - (space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8) ) /carLenght)/4;
+            let cimgw = ( ( (wtot/carLenght) *3)/4);
+            let cimgw1 =( ( (wtot/carLenght) *3)/4);
+            let cimgh = (cimgw*1.5)/2;
+            let cimgh1 = cimgw1;
+            let hgr2 = cimgh + 10;
+            let space9 =  doc1.getTextDimensions(testoSottoFoto).h; // + 10;
+            let space9_a = doc1.getTextDimensions(testoSottoFoto).h * 2;
+            let space9_a1 = (doc1.getTextDimensions(testoSottoFoto).h + cimgh1)* 2;
+            let spaceimg1 = 5;
+            let space10 = doc1.getTextDimensions(titolo2).h;
+            let space12 = 9;
+            let space13 = doc1.getTextDimensions(titoloSottoGrafico1).h;
+            let space14 = 5;
+            let space15 = 9;
+            let space15_1 = space15 * (n2+1);
+            let space16 = 5 + doc1.getTextDimensions(titoloSottoGrafico3).h;
+            let space17 = 15 + doc1.getTextDimensions(testoSottoGrafico1).h;
+            let space18 =  5 + doc1.getTextDimensions(testoSottoGrafico1).h;
+            let space19 = 7;
+            let space19_1 = space19 * (n3+1);
+            let space20 = 5;
+            let space21 = 5 + doc1.getTextDimensions(testoSottoGrafico1).h;
+            let space22 = 7;
+            let space22_1 = space22 * (n4+1);
+            let space23 = 3;
+            let space24 =  doc1.getTextDimensions(testoSottoGrafico1).h + 10;
+            const footerHeight = 50; // Altezza del piè di pagina
 
 
         if (spacetab1 < yGr1) {
             spacetab1 = yGr1 + 35;
         }
 
-        if (azienda == '1') {
-            y1 = y1 + hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6
-                + space7 + space8 + space9 + spacetab1 + space10 + space12 + space13 + space14 + space15_1
-                + space16 + space17 + space18 + space19_1 + space20 + space21 + space22_1;
-
-        } else {
-            if (azienda == '2') {
-                y1 = y1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
-                    + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16
-                    + space17 + space18 + spacetab2 + space21 + space21 + space21 + space22_1
-                    + (space9 + 10);
-
+            if(azienda == '1'){
+                y1 = y1 + hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
+                        + space7 + space8 + space9 + spacetab1 + space10  + space12 + space13 + space14  + space15_1 
+                        + space16 + space17 + space18 +  space19_1 + space20 + space21  + space22_1 ;
+                        
+            }else{
+                if(azienda == '2'){
+                    y1 = y1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
+                            + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16 
+                            + space17 + space18 + spacetab2 + space21 + space21 + space21 + space22_1  
+                            + ((space9+10));
+            
+                }
             }
-        }
-
-        let footerY = y1; // Posizione verticale
-        console.log('y1', y1, footerY);
-        const htot = y1; // + footerHeight;
+            
+            let footerY = y1 ; // Posizione verticale
+            console.log('y1', y1, footerY);
+            const htot = y1; // + footerHeight;
 
         let doc = new jsPDF({
             orientation: "portrait",        // "landscape" per orizzontale
@@ -601,19 +601,21 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             doc.addImage(imageData, 'JPEG', x, y, xGr, yGr);
         }
 
-        if (graficoLatoTabella2 && fs.existsSync(graficoLatoTabella2)) {
-            const imageData = fs.readFileSync(graficoLatoTabella2).toString('base64');
-            doc.addImage(imageData, 'JPEG', x, y + space, xGr, yGr);
-        }
-
-        //guardo fino a dove è arrivata la tabella
-        let space11 = Math.ceil(doc.lastAutoTable.finalY) + 10;
-        let space11a = (yGr * 2) + 10;
-        console.log(space11, space11a);
-        if (space11 < space11a)
-            space11 = space11a + 35;
-
-        console.log(y)
+                if (graficoLatoTabella2 && fs.existsSync(graficoLatoTabella2)) {
+                    const imageData = fs.readFileSync(graficoLatoTabella2).toString('base64');
+                    doc.addImage(imageData, 'JPEG', x, y + space, xGr, yGr);
+                }
+                
+                //guardo fino a dove è arrivata la tabella
+                let space11 = Math.ceil(doc.lastAutoTable.finalY)+10; 
+                let space11a =y+ (yGr * 2 ) + 5;
+                
+                console.log('space11',space11);
+                console.log('space11a',space11a);
+                if(space11 <= space11a)
+                    space11 = space11a;
+                
+                console.log('space11 dopo', space11)
 
         console.log(space11, space11a);
         y = space11 + space12;
