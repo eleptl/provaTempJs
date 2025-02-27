@@ -167,6 +167,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
         }
 
         let headers = [];
+        let headers1 = ["Parametro", "Valore", "Unita"];
         if(azienda == '1'){
             headers = ["Parametro", "Valore", "Unita"];
         }
@@ -177,6 +178,11 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
         suffixies = headers.map(header => 
             header.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
         );
+        let suffixies1 =[];
+        suffixies1 = headers1.map(header1 => 
+            header1.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
+        );
+        
 
             // Aggiornato: Creazione dati tabella con dati in base agli headers
             const tableData = Object.entries(headerTitles)
@@ -195,11 +201,11 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
             })
             .filter(row => row !== null); // Rimuove le righe vuote
+            
             //w tab
             let maxDataWidth = 0;
-            let  cellWidth = 0;
+            let cellWidth = 0;
             let maxw = 0;
-            let sum = 0;
             let headerWidth = 0;
             let xGr     =  25;
 
@@ -216,7 +222,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                     return maxw;
                 });
             }
-
+            // calcolo larghezza totale tabella (adattamento larghezza foglio)
             function getTotalTableWidth(headers, tableData) {
                 const columnWidths = getOptimalColumnWidths(headers, tableData);
                 const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0);
@@ -229,10 +235,9 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 wtot = maxwtot + 40 + xGr;
             }
 
-            
-
             //h righe
-            //
+            const fontCalc = 6;
+            const lineSpacCalc = 0.5;
             function calculateTableHeight(tableData,  fontSize, lineSpacing) {
                 let totaltableHeight = 0;
             
@@ -244,7 +249,6 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                         const cellHeight = textLines.length  * (fontSize  * lineSpacing);
                         console.log('altezza singola cella', cellHeight);
                         maxRowHeight = Math.max(maxRowHeight, cellHeight);
-                        //totaltableHeight += maxRowHeight;
                     });
             
                     totaltableHeight += maxRowHeight;
@@ -253,30 +257,21 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 return totaltableHeight;
             }
 
-            console.log('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh1',calculateTableHeight(tableData, 8-2, 0.5));
-        
-            //
-
                 const tableData1 = Object.entries(headerTitles1)
                 .filter(([_, value]) => value)
                     .map(([key, value]) => {
                         const row = [];
-                   
-                    suffixies.forEach(suffix => {
+                        suffixies1.forEach(suffix1 => {
     
-                        if(suffix == 'parametro')
-                            suffix = '';
-                        const colid = `${key}${suffix}`;
-                        //console.log(`Looking for: ${colid}`);
+                        if(suffix1 == 'parametro')
+                            suffix1 = '';
+                        const colid = `${key}${suffix1}`;
                         row.push(jsonData[colid] || "-");
                     });        
                     const isEmptyRow = row.every(cell => cell === "-" || cell === null || cell === "");
                     return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
                 })
                 .filter(row => row !== null); // Rimuove le righe vuote
-                    //console.log(tableData1);
-                    console.log('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh',calculateTableHeight(tableData1, 8-2,0.5));
-
 
             let elencop1 = [];
             let i = 1;
@@ -366,9 +361,9 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 }
             }
             //spaces
-            let spacetab1 = calculateTableHeight(tableData,  8-2,0.5);
+            let spacetab1 = calculateTableHeight(tableData,  fontCalc,lineSpacCalc);
             let yGr1 =( spacetab1 / 6.5)*2 + 10;
-            let spacetab2 = calculateTableHeight(tableData1, 8-2,0.5);
+            let spacetab2 = calculateTableHeight(tableData1, fontCalc,lineSpacCalc);
             let space1 = 6;
             let space2 = 10;
             let space3 = 3;
@@ -420,15 +415,16 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             }
 
             if(azienda == '1'){
-                y1 = y1 + /*cimgy +*/ hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
+                y1 = y1 + hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
                         + space7 + space8 + space9 + spacetab1 + space10  + space12 + space13 + space14  + space15_1 
                         + space16 + space17 + space18 +  space19_1 + space20 + space21  + space22_1 ;
                         
             }else{
                 if(azienda == '2'){
                     y1 = y1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
-                            + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16 + space17 + space18 + spacetab2
-                            + space21 + space21 + space21 + space22_1  + (space9+10);
+                            + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16 
+                            + space17 + space18 + spacetab2 + space21 + space21 + space21 + space22_1  
+                            + (space9+10);
             
                 }
             }
@@ -440,7 +436,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
         let doc = new jsPDF({
             orientation: "portrait",        // "landscape" per orizzontale
             unit: "mm",                     // Unità di misura ("mm", "cm", "in", "px")
-            //format: [wtot, htot-10]         // Larghezza e altezza personalizzate in mm
+            //format: [wtot, htot-10]       // Larghezza e altezza personalizzate in mm
             format: [wtot, y1]
         });           
         
@@ -455,10 +451,14 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             y += space1;
             doc.text(numeroProdotto, x, y);
 
+            let xLogo = wtot-45;
+            let yLogo = 5;
+            let wLogo = 35;
+            let hLogo = 10;
             //logo
             if (logo && fs.existsSync(logo)) {
                 const imageData = fs.readFileSync(logo).toString('base64');
-                doc.addImage(imageData, 'JPEG', wtot-45, 5, 35, 10);            
+                doc.addImage(imageData, 'JPEG', xLogo, yLogo, wLogo, hLogo);            
             }        
             y += space2;
 
@@ -484,7 +484,6 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                     hPhoto += spacef; 
                 }
             }
-            //y = hPhoto;// + space6 + 10;   
             y += space6;     
 
             // titolo        
@@ -541,38 +540,16 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             y = y +  space10;
 
             const marginLeft = 10;       
-            
-            /*let maxDataWidth = 0;
-            let  cellWidth = 0;
-            let maxw = 0;
 
-            // Funzione per calcolare larghezza massima delle colonne
-            function getOptimalColumnWidths(headers, tableData, doc) {
-                return headers.map((header, colIndex) => {
-                    const headerWidth = doc.getTextWidth(header);           // larghezza massima dei dati nella colonna 
-                    maxDataWidth = tableData.reduce((max, row) => {
-                        cellWidth = doc.getTextWidth(row[colIndex] || "");  // Se cella vuota, usa stringa vuota
-                        return Math.max(max, cellWidth);
-                    }, 0);            
-                    if(maxDataWidth >= wtot)
-                        maxDataWidth -= 40;
-                    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAA', maxDataWidth, headerWidth, wtot);
-                    maxw = Math.max(headerWidth, maxDataWidth-40);       //return Math.max(headerWidth-10, maxDataWidth-40);
-                    return maxw;
-                });
-            }*/
-            // Calcola le larghezze ottimali per le colonne
             const columnWidths = getOptimalColumnWidths(headers, tableData, doc);      
             const tableWidth = columnWidths.reduce((totalWidth, width) => totalWidth + width, 0);
 
             console.log('y prima di tabDat: ', y);
-            //doc.text('prima la tab1)', x ,y);
                 
             doc.autoTable({
                 startY: y,                                          // Posizione della tabella
                 margin: { left: marginLeft, right: maxw},
                 tableWidth: tableWidth,
-                //maxWidth: wtot-100,
                 head: [headers],
                 body: tableData,
                 styles: {
@@ -601,31 +578,15 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 }, {}),
                 tableLineColor: [0, 0, 0],                          // Colore dei bordi (nero)
                 tableLineWidth: 0.1,                                // Larghezza del bordo
-                /*didDrawPage: function (data) {
-                    // Se lo spazio della pagina è esaurito, aggiunge una nuova pagina
-                    if (data.cursor.y > pageHeight) {
-                        doc.addPage();
-                    }
-                }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////111
-               didDrawCell: function(data){
-                if(data.section === 'body'){
-                    console.log(`riga ${data.row.index} h ${data.cell.height}`);
-                }
-               }*/
             }); 
             const xT = marginLeft + tableWidth + 2.5; 
 
                 x += xT;
                 console.log('y dopo di tabDat: ', doc.lastAutoTable.finalY);
-                //doc.text('dopo la tab1',x,doc.lastAutoTable.finalY);
                 //graficoLatoTabella
                 let space   = (Math.ceil(doc.lastAutoTable.finalY)/6);
                 //let xGr     =  25;
-                let yGr     = (Math.ceil(doc.lastAutoTable.finalY)/6.5);//45;
-                //let yGr1     = calculateTableHeight(tableData,8-2,0.5) ;
-                
-                //console.log('CONFRONTO:', yGr, yGr1 );
-                //tab = Math.ceil(doc.lastAutoTable.finalY);
+                let yGr     = (Math.ceil(doc.lastAutoTable.finalY)/6.5);
             
                 if (graficoLatoTabella1 && fs.existsSync(graficoLatoTabella1)) {
                     const imageData = fs.readFileSync(graficoLatoTabella1).toString('base64');
@@ -656,23 +617,16 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
 
                 doc.setFontSize(12);
                 doc.setFont("helvetica", "bold");
-                doc.text(titoloSottoGrafico1, x, y, { maxWidth: 200 });
+                doc.text(titoloSottoGrafico1, x, y, { maxWidth: wtot - 20 });
                 diff = x + diff;
                 if(azienda =='1')
-                    doc.text(titoloSottoGrafico2, diff, y, { maxWidth: 200 });
+                    doc.text(titoloSottoGrafico2, diff, y, { maxWidth: wtot - 20 });
                 y = y + space13;
 
                 // "grafico"                 
                 doc.setFontSize(10);
                 let hGr = 60;
                 let wGr = 60;
-                /*if(azienda == '1'){
-                    hGr = 40;
-                }else{
-                    if(azienda == '2'){
-                        hGr = cimgh+10;
-                    }
-                }*/
                 if(azienda == '1'){
                     hGr = 40;
                     if (graficoSottoTabella && fs.existsSync(graficoSottoTabella)) {
@@ -716,12 +670,12 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 //titolo sotto grafico
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(12);
-                doc.text(titoloSottoGrafico3, x, y, { maxWidth: 200 });
+                doc.text(titoloSottoGrafico3, x, y, { maxWidth: wtot - 20 });
                 
                 doc.setFontSize(9);
                 y += space16;
                 doc.setFont("helvetica", "normal");
-                doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
+                doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
 
                 if(azienda == '2'){
                 let y2 = y + 10; 
@@ -739,7 +693,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                             
                 //titolo sotto grafico 2
                 doc.setFont("helvetica", "bold");
-                doc.text(titoloSottoGrafico4, x, y , { maxWidth: 200 });
+                doc.text(titoloSottoGrafico4, x, y , { maxWidth: wtot - 20 });
                 y += space18;
                 doc.setFont("helvetica", "normal");
 
@@ -756,36 +710,19 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
 
                 }else{
                     if(azienda == '2'){
-                        //doc.text('PRIMA la tab2)',x,y);
                         console.log('y prima di tabDat1: ', y);
-                       /* const tableData1 = Object.entries(headerTitles1)
-                        .filter(([_, value]) => value)
-                            .map(([key, value]) => {
-                                const row = [];
-                           
-                            suffixies.forEach(suffix => {
-            
-                                if(suffix == 'parametro')
-                                    suffix = '';
-                                const colid = `${key}${suffix}`;
-                                //console.log(`Looking for: ${colid}`);
-                                row.push(jsonData[colid] || "-");
-                            });        
-                            const isEmptyRow = row.every(cell => cell === "-" || cell === null || cell === "");
-                            return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
-                        })
-                        .filter(row => row !== null); // Rimuove le righe vuote
-                            console.log(tableData1);*/
-                        
+                            const columnWidths1 = getOptimalColumnWidths(headers1, tableData1, doc);      
+                            const tableWidth1 = columnWidths1.reduce((totalWidth1, width1) => totalWidth1 + width1, 0);
+
                         doc.autoTable({
                             startY: y,                                          // Posizione della tabella
                             margin: { left: marginLeft, right: maxw },
-                            tableWidth: tableWidth,
-                            head: [headers],
+                            tableWidth: tableWidth1,
+                            head: [headers1],
                             body: tableData1,
                             styles: {
                                 fontSize: 8,
-                                cellPadding: 0.2,                                 // Margine interno delle celle
+                                cellPadding: 0.1,                                 // Margine interno delle celle
                                 overflow: 'linebreak',                          // Gestisce l'overflow con interruzioni di riga
                                 halign: 'left',                                 // Allineamento orizzontale
                                 valign: 'middle',                               // Allineamento verticale
@@ -800,50 +737,42 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                                 lineWidth: 0.01,                                // Larghezza dei bordi
                                 lineColor: [0, 0, 0],                          // Colore dei bordi (nero)
                             },
-                            columnStyles: headers.reduce((styles, header, index) => {
+                            columnStyles: headers1.reduce((styles, header1, index) => {
                                 styles[index] = {
-                                    cellWidth: columnWidths[index],
+                                    cellWidth: columnWidths1[index],
                                     fontStyle: index === 0 ? 'bold' : 'normal'  // Grassetto per la prima colonna
                                 };
                                 return styles;
                             }, {}),
                             tableLineColor: [0, 0, 0],                          // Colore dei bordi (nero)
                             tableLineWidth: 0.1,                                // Larghezza del bordo
-                            /*didDrawPage: function (data) {
-                                // Se lo spazio della pagina è esaurito, aggiunge una nuova pagina
-                                if (data.cursor.y > pageHeight) {
-                                    doc.addPage();
-                                }
-                            }*/
                         }); 
                         y = Math.ceil(doc.lastAutoTable.finalY)+10;
             
                     }
                 }
-
-                //doc.text('DOPO la tabella)',x,doc.lastAutoTable.finalY);
                 console.log('y dopo di tabDat1: ', y);
 
                 doc.setFont("helvetica", "normal");
                 if(azienda == '2'){
                     
-                doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
+                doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
                 y = y + space21;
                 }
                 //titolo sotto grafico 2                
                 doc.setFont("helvetica", "bold");
-                doc.text(titoloSottoGrafico5, x, y, { maxWidth: 200 });
+                doc.text(titoloSottoGrafico5, x, y, { maxWidth: wtot - 20 });
                 y = y + space21;
                 doc.setFont("helvetica", "normal");
 
                 if(azienda == '2'){
-                    doc.text(testoSottoGrafico1, x, y, { maxWidth: 200 });
+                    doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
                     y = y + space21;
                 }
 
                 y += space23;
 
-                for(let j = 8; j<12; j++){
+                for(let j =8; j<12; j++){ //n4 8 12
                     if (elencop4[j]) {
                         doc.text(`• ` + elencop4[j], x, y);
                         y += space22;
@@ -851,7 +780,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 }
                 //testo sotto grafico 2
                 doc.setFontSize(7);
-                doc.text(testoSottoGrafico1, x, y);//, { maxWidth: 200 });
+                doc.text(testoSottoGrafico1, x, y ,{ maxWidth: wtot - 20 });
 
                 console.log('y finale: ', y);
                 console.log('y1 totale: ', y1);
