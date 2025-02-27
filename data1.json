@@ -1,6 +1,6 @@
 {
   
-    "azienda" : "2",
+    "azienda" : "1",
     "descr": "DescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescriz",
     "nome": "Nome Prodotto", 
     "princApp": "Principali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali Applicazio",
@@ -46,6 +46,7 @@
     "assorbimentodescrizione": "Corrente elettrica massima assorbita",
     "assorbimentovalore": "5",
     "assorbimentosku": "ELE-ASS-004",
+    
   
     "attacco_aspirazione_scarico": "Attacco Aspirazione/Scarico",
     "attacco_aspirazione_scaricoparametro": "Diametro attacco",
@@ -278,6 +279,7 @@
     "pesovalore": "peso",
     "pesosku": "peso",
 
+    
     "portata_massima_aria": "portata masisma aria",
     "portata_massima_ariaprodotto": "portata masisma aria",
     "portata_massima_ariaunita": "portata masisma aria",

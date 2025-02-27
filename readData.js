@@ -15,7 +15,7 @@ const ImageFactory = {
         return imageData; 
     }
 };
-const wtot = 290;
+var wtot = 290;
 
 fs.readFile('data1.json', 'utf8', (err, data) => {
     if (err) {
@@ -195,6 +195,41 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
             })
             .filter(row => row !== null); // Rimuove le righe vuote
+            //w tab
+            let maxDataWidth = 0;
+            let  cellWidth = 0;
+            let maxw = 0;
+            let sum = 0;
+            let headerWidth = 0;
+            let xGr     =  25;
+
+            // Funzione per calcolare larghezza massima delle colonne
+            function getOptimalColumnWidths(headers, tableData) {
+                return headers.map((header, colIndex) => {
+                    headerWidth = doc1.getTextWidth(header);           // larghezza massima dei dati nella colonna 
+                    maxDataWidth = tableData.reduce((max, row) => {
+                        cellWidth = doc1.getTextWidth(row[colIndex] || "");  // Se cella vuota, usa stringa vuota
+                        return Math.max(max, cellWidth);
+                    }, 0);            
+                    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAA', maxDataWidth, headerWidth, wtot);
+                    maxw = Math.max(headerWidth, maxDataWidth-20);       //return Math.max(headerWidth-10, maxDataWidth-40);
+                    return maxw;
+                });
+            }
+
+            function getTotalTableWidth(headers, tableData) {
+                const columnWidths = getOptimalColumnWidths(headers, tableData);
+                const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+                return totalWidth;
+            }
+
+            let maxwtot = getTotalTableWidth(headers, tableData);
+            console.log('wtot: ', maxwtot , 'tot', wtot);
+            if(maxwtot >= wtot){
+                wtot = maxwtot + 40 + xGr;
+            }
+
+            
 
             //h righe
             //
@@ -332,6 +367,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             }
             //spaces
             let spacetab1 = calculateTableHeight(tableData,  8-2,0.5);
+            let yGr1 =( spacetab1 / 6.5)*2 + 10;
             let spacetab2 = calculateTableHeight(tableData1, 8-2,0.5);
             let space1 = 6;
             let space2 = 10;
@@ -377,6 +413,11 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             let space23 = 3;
             let space24 =  doc1.getTextDimensions(testoSottoGrafico1).h + 10;
             const footerHeight = 50; // Altezza del piè di pagina
+
+
+            if(spacetab1 < yGr1){
+                spacetab1 = yGr1 + 35;
+            }
 
             if(azienda == '1'){
                 y1 = y1 + /*cimgy +*/ hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
@@ -492,7 +533,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 y = y+ cimgh1 + space9_a;
                 }
             }
-            y += 5;
+            y += 15;
             //titolo sopra tabella
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
@@ -500,7 +541,8 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             y = y +  space10;
 
             const marginLeft = 10;       
-            let maxDataWidth = 0;
+            
+            /*let maxDataWidth = 0;
             let  cellWidth = 0;
             let maxw = 0;
 
@@ -512,10 +554,13 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                         cellWidth = doc.getTextWidth(row[colIndex] || "");  // Se cella vuota, usa stringa vuota
                         return Math.max(max, cellWidth);
                     }, 0);            
-                    maxw = Math.max(headerWidth-10, maxDataWidth-40);       //return Math.max(headerWidth-10, maxDataWidth-40);
+                    if(maxDataWidth >= wtot)
+                        maxDataWidth -= 40;
+                    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAA', maxDataWidth, headerWidth, wtot);
+                    maxw = Math.max(headerWidth, maxDataWidth-40);       //return Math.max(headerWidth-10, maxDataWidth-40);
                     return maxw;
                 });
-            }
+            }*/
             // Calcola le larghezze ottimali per le colonne
             const columnWidths = getOptimalColumnWidths(headers, tableData, doc);      
             const tableWidth = columnWidths.reduce((totalWidth, width) => totalWidth + width, 0);
@@ -544,7 +589,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 bodyStyles: {
                     fillColor: [255, 255, 255],                    // Colore di riempimento per il corpo (bianco)
                     textColor: [0, 0, 0],                          // Colore del testo per il corpo
-                    lineWidth: 0.01,                                // Larghezza dei bordi
+                    lineWidth: 0.001,                                // Larghezza dei bordi
                     lineColor: [0, 0, 0],                          // Colore dei bordi (nero)
                 },
                 columnStyles: headers.reduce((styles, header, index) => {
@@ -575,8 +620,11 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 //doc.text('dopo la tab1',x,doc.lastAutoTable.finalY);
                 //graficoLatoTabella
                 let space   = (Math.ceil(doc.lastAutoTable.finalY)/6);
-                let xGr     =  25;
+                //let xGr     =  25;
                 let yGr     = (Math.ceil(doc.lastAutoTable.finalY)/6.5);//45;
+                //let yGr1     = calculateTableHeight(tableData,8-2,0.5) ;
+                
+                //console.log('CONFRONTO:', yGr, yGr1 );
                 //tab = Math.ceil(doc.lastAutoTable.finalY);
             
                 if (graficoLatoTabella1 && fs.existsSync(graficoLatoTabella1)) {
@@ -591,7 +639,16 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 
                 //guardo fino a dove è arrivata la tabella
                 let space11 = Math.ceil(doc.lastAutoTable.finalY)+10; 
-                y = space11 + space12;
+                let space11a = (yGr * 2 ) + 10;
+                console.log(space11,space11a);
+                if(space11 < space11a)
+                    space11 = space11a+35;
+                
+                console.log(y)
+
+                console.log(space11,space11a);
+                y = space11 + space12 ;
+                console.log(y)
 
                 //agg. coordinate
                 x = 10;
