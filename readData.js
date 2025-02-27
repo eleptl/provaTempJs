@@ -362,7 +362,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
             }
             //spaces
             let spacetab1 = calculateTableHeight(tableData,  fontCalc,lineSpacCalc);
-            let yGr1 =( spacetab1 / 6.5)*2 + 10;
+            let yGr1 =( spacetab1 / 6.5)*2 + 35;
             let spacetab2 = calculateTableHeight(tableData1, fontCalc,lineSpacCalc);
             let space1 = 6;
             let space2 = 10;
@@ -424,7 +424,7 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                     y1 = y1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
                             + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16 
                             + space17 + space18 + spacetab2 + space21 + space21 + space21 + space22_1  
-                            + (space9+10);
+                            + ((space9+10));
             
                 }
             }
@@ -600,12 +600,14 @@ fs.readFile('data1.json', 'utf8', (err, data) => {
                 
                 //guardo fino a dove è arrivata la tabella
                 let space11 = Math.ceil(doc.lastAutoTable.finalY)+10; 
-                let space11a = (yGr * 2 ) + 10;
-                console.log(space11,space11a);
-                if(space11 < space11a)
-                    space11 = space11a+35;
+                let space11a =y+ (yGr * 2 ) + 5;
                 
-                console.log(y)
+                console.log('space11',space11);
+                console.log('space11a',space11a);
+                if(space11 <= space11a)
+                    space11 = space11a;
+                
+                console.log('space11 dopo', space11)
 
                 console.log(space11,space11a);
                 y = space11 + space12 ;
