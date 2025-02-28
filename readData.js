@@ -15,7 +15,26 @@ const ImageFactory = {
         return imageData; 
     }
 };
+
+//font
+const fontPathDemi       = "Font_ttf/KohinoorLatin-Demi.ttf";
+const fontPathDemi2      = "Font_ttf/KohinoorLatin-Demi2.ttf";
+const fontPathLight      = "Font_ttf/KohinoorLatin-Light.ttf";
+const fontPathLight2     = "Font_ttf/KohinoorLatin-Light2.ttf";
+
+function convertTTFtoBase64(path) {
+  return fs.readFileSync(path).toString('base64');
+}
+
+let base64Demi = convertTTFtoBase64(fontPathDemi);
+let base64Demi2 = convertTTFtoBase64(fontPathDemi2);
+let base64Light= convertTTFtoBase64(fontPathLight);
+let base64Light2 = convertTTFtoBase64(fontPathLight2);
+
+//path dataFile.jsof
 const jsonFilePath = 'data1.json';
+
+// function for create pdf
 function createPdfFromJsonFile(jsonFilePath) {
         fs.readFile(jsonFilePath, 'utf8', (err, data) => {
             if (err) {
@@ -440,7 +459,20 @@ function createPdfFromJsonFile(jsonFilePath) {
                     //format: [wtot, htot-10]       // Larghezza e altezza personalizzate in mm
                     format: [wtot, y1]
                 });           
-                
+
+                    //font                   
+                    doc.addFileToVFS("KohinoorLatin-Demi.ttf", base64Demi);
+                    doc.addFont("KohinoorLatin-Demi.ttf","Demi",base64Demi,"normal");
+                    
+                    doc.addFileToVFS("KohinoorLatin-Demi2.ttf", base64Demi);
+                    doc.addFont("KohinoorLatin-Demi.ttf","Demi2",base64Demi,"normal");
+                    
+                    doc.addFileToVFS("KohinoorLatin-Light.ttf", base64Demi);
+                    doc.addFont("KohinoorLatin-Demi.ttf","Light",base64Demi,"normal");
+                    
+                    doc.addFileToVFS("KohinoorLatin-Light2.ttf", base64Demi);
+                    doc.addFont("KohinoorLatin-Demi.ttf","Light2",base64Demi,"normal");
+               
                     // nome prodotto
                     doc.setFontSize(25);
                     doc.setFont("helvetica", "bold");
@@ -450,6 +482,8 @@ function createPdfFromJsonFile(jsonFilePath) {
                     doc.setFontSize(15)
                     doc.setFont("helvetica", "normal");
                     y += space1;
+                    
+                    doc.setFont("helvetica", "normal");
                     doc.text(numeroProdotto, x, y);
 
                     let xLogo = wtot-45;
