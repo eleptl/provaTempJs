@@ -1,9 +1,10 @@
 {
   
-    "azienda" : "1",
+    "company" : "2",
+    
     "descr": "DescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescrizioneDescriz",
     "nome": "Nome Prodotto", 
-    "princApp": "Principali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali Applicazio",
+    "princapp": "Principali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali ApplicazioniPrincipali Applicazio",
     "riga1": "Lista dettagli (riga 1)",
     "riga2": "Lista dettagli (riga 2)",
     "riga3": "Lista dettagli (riga 3)",
@@ -423,7 +424,7 @@
     "valvola_rompivuoto_di_sicurezzasku": "valvola sicurezza",
 
 
-    "fotoprodotto": "images/carosello8.jpg",
+    "img1": "images/carosello8.jpg",
     "logo": "images/logo.jpg",        
     "elencoPuntatoLatoGrafico1" : "Omologazione1",
     "elencoPuntatoLatoGrafico2" : "Omologazione2",    
@@ -433,8 +434,8 @@
     "elencoPuntatoLatoGrafico6" : "Omologazione2",    
     "elencoPuntatoLatoGrafico7" : "Omologazione3",
 
-    "graficoLatoTabella1" : "images/carosello2.png",
-    "graficoLatoTabella2" : "images/carosello3.png",
+    "img12" : "images/carosello2.png",
+    "img13" : "images/carosello3.png",
     "nomeProdotto":  "Nome del Prodotto",    
     "tabella": [
       {
@@ -495,7 +496,7 @@
           "16": "r1c4"
       }
   ],
-  "graficoSottoTabella": "images/GraficoprestazionePrime150-1.jpg",
+  "img14": "images/GraficoprestazionePrime150-1.jpg",
     "carosello1": "images/carosello1.jpg",
     "carosello2": "images/carosello4.png",    
     "carosello3": "images/carosello5.jpg",
@@ -528,7 +529,7 @@
     "elencoPuntatoLatoFoto5" : "Prova5",
     "elencoPuntatoLatoFoto6" : "Prova6",
 
-    "pie_di_pagina" : "images/Piede_schede_tecniche.pdf"
+    "pie_di_pagina" : "images/piedipagina.jpg"
 
   }
    

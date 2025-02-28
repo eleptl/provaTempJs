@@ -3,6 +3,8 @@ const { json, get, jsonp } = require('express/lib/response');
 const fs = require('fs');
 const { jsPDF } = require('jspdf');
 const { PDFDocument } = require('pdf-lib');
+// import axios from 'axios';
+//const axios = require('axios');
 
 const path = require('path');
 require('jspdf-autotable');
@@ -33,15 +35,28 @@ let base64Light2 = convertTTFtoBase64(fontPathLight2);
 
 //path dataFile.jsof
 const jsonFilePath = 'data1.json';
+const jsonFIlePath2 = 'data2.json';
 
 // function for create pdf
-function createPdfFromJsonFile(jsonFilePath) {
+function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
+    fs.readFile(jsonFilePath, 'utf8', (err, data2) => {
+        if (err) {
+            console.error('Errore nella lettura del file:', err);
+            return;
+        }
+    
+        const jsonData2 = JSON.parse(data2);
+    })
+
+
         fs.readFile(jsonFilePath, 'utf8', (err, data) => {
             if (err) {
                 console.error('Errore nella lettura del file:', err);
                 return;
             }
 
+            
+            
             try {
                 const desktopPath = path.join(require('os').homedir(), 'Desktop');
                 const jsonData = JSON.parse(data);
@@ -54,24 +69,24 @@ function createPdfFromJsonFile(jsonFilePath) {
                 let x = 10; 
 
                 // get json data
-                let azienda = jsonData.azienda;                     // azienda => dipende il template
+                let company = jsonData.company;                     // company => dipende il template
                 const piedipagina = jsonData.pie_di_pagina;
                 
                 let doc1 = new jsPDF(); 
 
-                const nomeProdotto = jsonData.nome;
-                const numeroProdotto = jsonData.nomeProdotto;
-                const testoLatoFoto = jsonData.descr;
-                const fotoprodotto = jsonData.fotoprodotto;
-                const dow = jsonData.dow;
-                const logo = jsonData.logo;
-                const graficoLatoTabella1 = jsonData.graficoLatoTabella1;
-                const graficoLatoTabella2 = jsonData.graficoLatoTabella2;
-                const graficoSottoTabella = jsonData.graficoSottoTabella;
+                const nome = jsonData.nome;
+                const sku = jsonData.sku;
+                const descr = jsonData.descr;
+                const img1 = jsonData.img1;
+                const logo = "images/logo.jpg";//jsonData.logo;
+                const img12 = jsonData.img12;
+                const img13 = jsonData.img13;
+                const img14 = jsonData.img14;
 
                 const headerTitles = { 
                     
-                    "air_cloud": jsonData.air_cloud,   
+                    //"air_cloud": jsonData.air_cloud,
+                       
                     "alimentazione": jsonData.alimentazione,
                     "alimentazione_prese": jsonData.alimentazione_prese,
                     "altezza": jsonData.altezza,
@@ -124,12 +139,343 @@ function createPdfFromJsonFile(jsonFilePath) {
                     "sfiato_aria": jsonData.sfiato_aria,
                     "sfiato_micropolveri": jsonData.sfiato_micropolveri,
                     "silenziatore_scarico_aria": jsonData.silenziatore_scarico_aria,
-                    //"sku": jsonData.sku,
                     "superficie_filtrante": jsonData.superficie_filtrante,
                     "superficie_max_da_pulire": jsonData.superficie_max_da_pulire,
                     "tendisacco": jsonData.tendisacco,
                     "uscita_aria": jsonData.uscita_aria,
                     "valvola_rompivuoto_di_sicurezza": jsonData.valvola_rompivuoto_di_sicurezza,
+                    /**
+                     * "cap" : jsonData.cap,
+                        "misura" : jsonData.misura,
+                        "misa" : jsonData.misa,
+                        "misb" : jsonData.misb,
+                        "misc" : jsonData.misc,
+                        "misd" : jsonData.misd,
+                        "mise" : jsonData.mise,
+                        "misf" : jsonData.misf,
+                        "misg" : jsonData.misg,
+                        "mish" : jsonData.mish,
+                        "misi" : jsonData.misi,
+                        "misl" : jsonData.misl,
+                        "mism" : jsonData.mism,
+                        "misn" : jsonData.misn,
+                        "miso" : jsonData.miso,
+                        "misp" : jsonData.misp,
+                        "misq" : jsonData.misq,
+                        "misr" : jsonData.misr,
+                        "miss" : jsonData.miss,
+                        "mist" : jsonData.mist,
+                        "misu" : jsonData.misu,
+                        "misv" : jsonData.misv,
+                        "misz" : jsonData.misz,
+                        "misxmin" : jsonData.misxmin,
+                        "mat" : jsonData.mat,
+                        "finitura" : jsonData.finitura,
+                        "tubofless" : jsonData.tubofless,
+                        "classeres" : jsonData.classeres,
+                        "accessori" : jsonData.accessori,
+                        "puntipresasp" : jsonData.puntipresasp,
+                        "supmaxpulire" : jsonData.supmaxpulire,
+                        "op" : jsonData.op,
+                        "sfiatomicrop" : jsonData.sfiatomicrop,
+                        "compmanut" : jsonData.compmanut,
+                        "presaabo" : jsonData.presaabo,
+                        "attaspiscarico" : jsonData.attaspiscarico,
+                        "gradoprot" : jsonData.gradoprot,
+                        "alim" : jsonData.alim,
+                        "frequ" : jsonData.frequ,
+                        "potmotore" : jsonData.potmotore,
+                        "assorb" : jsonData.assorb,
+                        "alimprese" : jsonData.alimprese,
+                        "portataaria" : jsonData.portataaria,
+                        "depressmax" : jsonData.depressmax,
+                        "classfiltr" : jsonData.classfiltr,
+                        "supfiltr" : jsonData.supfiltr,
+                        "capcontpolveri" : jsonData.capcontpolveri,
+                        "silenzaria" : jsonData.silenzaria,
+                        "peso" : jsonData.peso,
+                        "rumorotot" : jsonData.rumorotot,
+                        "rumor1motore" : jsonData.rumor1motore,
+                        "rumor2motori" : jsonData.rumor2motori,
+                        "uscitaaria" : jsonData.uscitaaria,
+                        "pot" : jsonData.pot,
+                        "pressaria" : jsonData.pressaria,
+                        "capbombola" : jsonData.capbombola,
+                        "scatincasso" : jsonData.scatincasso,
+                        "cornicemuro" : jsonData.cornicemuro,
+                        "kitpulizia" : jsonData.kitpulizia,
+                        "airpowmax" : jsonData.airpowmax,
+                        "maxtubi" : jsonData.maxtubi,
+                        "centralspiranti" : jsonData.centralspiranti,
+                        "conf" : jsonData.conf,
+                        "dia" : jsonData.dia,
+                        "tuboflessraccordo" : jsonData.tuboflessraccordo,
+                        "tuboflisy2" : jsonData.tuboflisy2,
+                        "tubosensecalza" : jsonData.tubosensecalza,
+                        "tubosensesenza" : jsonData.tubosensesenza,
+                        "impugnaturasense" : jsonData.impugnaturasense,
+                        "gancio4pz" : jsonData.gancio4pz,
+                        "cestello10pz" : jsonData.cestello10pz,
+                        "spazzolapolv" : jsonData.spazzolapolv,
+                        "lanciaangoli" : jsonData.lanciaangoli,
+                        "prolunrigida" : jsonData.prolunrigida,
+                        "spazzolapavim" : jsonData.spazzolapavim,
+                        "spazzolapavtapp" : jsonData.spazzolapavtapp,
+                        "spazzolaabiti" : jsonData.spazzolaabiti,
+                        "spazzolamaterassi" : jsonData.spazzolamaterassi,
+                        "accfermaoggetti" : jsonData.accfermaoggetti,
+                        "prolunatelesco" : jsonData.prolunatelesco,
+                        "spazzolaradiatori" : jsonData.spazzolaradiatori,
+                        "lineaspazzole" : jsonData.lineaspazzole,
+                        "setole" : jsonData.setole,
+                        "numaccessori" : jsonData.numaccessori,
+                        "imballo" : jsonData.imballo,
+                        "retetubiera" : jsonData.retetubiera,
+                        "spessore" : jsonData.spessore,
+                        "versione" : jsonData.versione,
+                        "bancale" : jsonData.bancale,
+                        "formato" : jsonData.formato,
+                        "lunghezza" : jsonData.lunghezza,
+                        "colorefinitura" : jsonData.colorefinitura,
+                        "preselinea" : jsonData.preselinea,
+                        "conductermica" : jsonData.conductermica,
+                        "resistelett" : jsonData.resistelett,
+                        "resisturto" : jsonData.resisturto,
+                        "lslowsmoke" : jsonData.lslowsmoke,
+                        "zerohalogen" : jsonData.zerohalogen,
+                        "resistfuoco" : jsonData.resistfuoco,
+                        "direttivabassatensione" : jsonData.direttivabassatensione,
+                        "tensionenom" : jsonData.tensionenom,
+                        "conformecpr" : jsonData.conformecpr,
+                        "classecpr" : jsonData.classecpr,
+                        "antistatico" : jsonData.antistatico,
+                        "atex" : jsonData.atex,
+                        "sezione" : jsonData.sezione,
+                        "impianti" : jsonData.impianti,
+                        "multiimpsense" : jsonData.multiimpsense,
+                        "monoimpsense" : jsonData.monoimpsense,
+                        "puntipresa" : jsonData.puntipresa,
+                        "contropresacurvo" : jsonData.contropresacurvo,
+                        "tubopvc" : jsonData.tubopvc,
+                        "curvamf" : jsonData.curvamf,
+                        "curvaff" : jsonData.curvaff,
+                        "derivazioneff" : jsonData.derivazioneff,
+                        "manicotto" : jsonData.manicotto,
+                        "grigliasfiato" : jsonData.grigliasfiato,
+                        "guainaelettrica" : jsonData.guainaelettrica,
+                        "colla250" : jsonData.colla250,
+                        "tipocontropresa" : jsonData.tipocontropresa,
+                        "cover" : jsonData.cover,
+                        "curvaff225" : jsonData.curvaff225,
+                        "curvaff45" : jsonData.curvaff45,
+                        "curvaff90" : jsonData.curvaff90,
+                        "colla60" : jsonData.colla60,
+                        "manicottopvc2" : jsonData.manicottopvc2,
+                        "manicotto50" : jsonData.manicotto50,
+                        "tubopvc2" : jsonData.tubopvc2,
+                        "barra" : jsonData.barra,
+                        "larghezza" : jsonData.larghezza,
+                        "linea" : jsonData.linea,
+                        "contropresa" : jsonData.contropresa,
+                        "seriecivile" : jsonData.seriecivile,
+                        "coloresportello" : jsonData.coloresportello,
+                        "installazione" : jsonData.installazione,
+                        "install" : jsonData.install,
+                        "ingressopolveri" : jsonData.ingressopolveri,
+                        "contenitoripolveri" : jsonData.contenitoripolveri,
+                        "profondita" : jsonData.profondita,
+                        "lunghezzatubo" : jsonData.lunghezzatubo,
+                        "onofflisy2" : jsonData.onofflisy2,
+                        "regolatorepressione" : jsonData.regolatorepressione,
+                        "gradoipimpugnatura" : jsonData.gradoipimpugnatura,
+                        "gradoipricevente" : jsonData.gradoipricevente,
+                        "operatorimax" : jsonData.operatorimax,
+                        "batteria" : jsonData.batteria,
+                        "vdc" : jsonData.vdc,
+                        "vdcmin" : jsonData.vdcmin,
+                        "in_ampere" : jsonData.in_ampere,
+                        "nervaturerinforzo" : jsonData.nervaturerinforzo,
+                        "frequenza" : jsonData.frequenza,
+                        "vac" : jsonData.vac,
+                        "vacmin" : jsonData.vacmin,
+                        "vacmax" : jsonData.vacmax,
+                        "fusibileprotezione" : jsonData.fusibileprotezione,
+                        "antennarf" : jsonData.antennarf,
+                        "imax" : jsonData.imax,
+                        "isniff" : jsonData.isniff,
+                        "isleep" : jsonData.isleep,
+                        "cavominiusb" : jsonData.cavominiusb,
+                        "raccordi360" : jsonData.raccordi360,
+                        "universale" : jsonData.universale,
+                        "supidonee" : jsonData.supidonee,
+                        "turbotech" : jsonData.turbotech,
+                        "imbocco" : jsonData.imbocco,
+                        "snodo" : jsonData.snodo,
+                        "altezza" : jsonData.altezza,
+                        "portatamax" : jsonData.portatamax,
+                        "fusibile" : jsonData.fusibile,
+                        "assorbmax" : jsonData.assorbmax,
+                        "dimacarta" : jsonData.dimacarta,
+                        "alimaus" : jsonData.alimaus,
+                        "caricocombust" : jsonData.caricocombust,
+                        "staffamuro" : jsonData.staffamuro,
+                        "rumorosita" : jsonData.rumorosita,
+                        "disgiuntterm" : jsonData.disgiuntterm,
+                        "filtroispez" : jsonData.filtroispez,
+                        "capmaxdos" : jsonData.capmaxdos,
+                        "capmax" : jsonData.capmax,
+                        "cariconomuscite" : jsonData.cariconomuscite,
+                        "fusibileprot" : jsonData.fusibileprot,
+                        "tempfunz" : jsonData.tempfunz,
+                        "umidita" : jsonData.umidita,
+                        "numgiri" : jsonData.numgiri,
+                        "tempfunzminmax" : jsonData.tempfunzminmax,
+                        "gradoumidita" : jsonData.gradoumidita,
+                        "classeiso" : jsonData.classeiso,
+                        "coppianom" : jsonData.coppianom,
+                        "volumenetto" : jsonData.volumenetto,
+                        "lungcavo" : jsonData.lungcavo,
+                        "tempesercminmax" : jsonData.tempesercminmax,
+                        "tessuto" : jsonData.tessuto,
+                        "tubazioni" : jsonData.tubazioni,
+                        "uscitapolveri" : jsonData.uscitapolveri,
+                        "misurax" : jsonData.misurax,
+                        "capdosatore" : jsonData.capdosatore,
+                        "altezzamaxh" : jsonData.altezzamaxh,
+                        "altezzaminh" : jsonData.altezzaminh,
+                        "escming" : jsonData.escming,
+                        "escmaxh" : jsonData.escmaxh,
+                        "colore" : jsonData.colore,
+                        "compatibilita" : jsonData.compatibilita,
+                        "diametrokit" : jsonData.diametrokit,
+                        "voltmassimo" : jsonData.voltmassimo,
+                        "corrmassima" : jsonData.corrmassima,
+                        "carico" : jsonData.carico,
+                        "regsensibilita" : jsonData.regsensibilita,
+                        "regritardo" : jsonData.regritardo,
+                        "diametrosensore" : jsonData.diametrosensore,
+                        "certatex" : jsonData.certatex,
+                        "diametroint" : jsonData.diametroint,
+                        "racctubometallo" : jsonData.racctubometallo,
+                        "raccurvoplastic" : jsonData.raccurvoplastic,
+                        "coppiatubicromati" : jsonData.coppiatubicromati,
+                        "spazzolapavimento" : jsonData.spazzolapavimento,
+                        "permotoriaspiranti" : jsonData.permotoriaspiranti,
+                        "pesodosatore" : jsonData.pesodosatore,
+                        "pesomotore" : jsonData.pesomotore,
+                        "idealeper" : jsonData.idealeper,
+                        "misuraine" : jsonData.misuraine,
+                        "misuraoute" : jsonData.misuraoute,
+                        "pressioneariamax" : jsonData.pressioneariamax,
+                        "grigliaprotfiltro" : jsonData.grigliaprotfiltro,
+                        "tendisacco" : jsonData.tendisacco,
+                        "corpo" : jsonData.corpo,
+                        "tenute" : jsonData.tenute,
+                        "partiinterne" : jsonData.partiinterne,
+                        "tensione" : jsonData.tensione,
+                        "potassorbita" : jsonData.potassorbita,
+                        "serviziocont" : jsonData.serviziocont,
+                        "connelettrica" : jsonData.connelettrica,
+                        "funzione" : jsonData.funzione,
+                        "azionamento" : jsonData.azionamento,
+                        "connpneumatiche" : jsonData.connpneumatiche,
+                        "dn" : jsonData.dn,
+                        "pn" : jsonData.pn,
+                        "pressinelavorominmax" : jsonData.pressinelavorominmax,
+                        "fluido" : jsonData.fluido,
+                        "tempirisposta" : jsonData.tempirisposta,
+                        "scaricoterzavia" : jsonData.scaricoterzavia,
+                        "attaccitubpvc" : jsonData.attaccitubpvc,
+                        "assorbelettrovalvola" : jsonData.assorbelettrovalvola,
+                        "attariacompressa" : jsonData.attariacompressa,
+                        "alimelettrovalvola" : jsonData.alimelettrovalvola,
+                        "pressioneingressoac" : jsonData.pressioneingressoac,
+                        "pressioneacmax" : jsonData.pressioneacmax,
+                        "pressioneflussomin" : jsonData.pressioneflussomin,
+                        "pressioneflussomax" : jsonData.pressioneflussomax,
+                        "attaccitubfilettatia" : jsonData.attaccitubfilettatia,
+                        "tassello" : jsonData.tassello,
+                        "lungtassello" : jsonData.lungtassello,
+                        "rondella" : jsonData.rondella,
+                        "mattassello" : jsonData.mattassello,
+                        "coltassello" : jsonData.coltassello,
+                        "distanzld" : jsonData.distanzld,
+                        "foroggfiss" : jsonData.foroggfiss,
+                        "punzone" : jsonData.punzone,
+                        "lungfilint" : jsonData.lungfilint,
+                        "vite" : jsonData.vite,
+                        "lungviteld" : jsonData.lungviteld,
+                        "tipotesta" : jsonData.tipotesta,
+                        "largtesta" : jsonData.largtesta,
+                        "matvite" : jsonData.matvite,
+                        "colorvite" : jsonData.colorvite,
+                        "pitoneria" : jsonData.pitoneria,
+                        "chiave" : jsonData.chiave,
+                        "occhiolo" : jsonData.occhiolo,
+                        "gancio" : jsonData.gancio,
+                        "coppiaserr" : jsonData.coppiaserr,
+                        "spessmaxfiss" : jsonData.spessmaxfiss,
+                        "profposa" : jsonData.profposa,
+                        "profeffins" : jsonData.profeffins,
+                        "matcarico" : jsonData.matcarico,
+                        "trazione" : jsonData.trazione,
+                        "taglio" : jsonData.taglio,
+                        "trazobliqua" : jsonData.trazobliqua,
+                        "trazsism" : jsonData.trazsism,
+                        "tipotass" : jsonData.tipotass,
+                        "perapplin" : jsonData.perapplin,
+                        "distcritbordo" : jsonData.distcritbordo,
+                        "intercrit" : jsonData.intercrit,
+                        "intermin" : jsonData.intermin,
+                        "distminbord" : jsonData.distminbord,
+                        "spessminsupp" : jsonData.spessminsupp,
+                        "matprima" : jsonData.matprima,
+                        "gradoinfiamm" : jsonData.gradoinfiamm,
+                        "tempfusio" : jsonData.tempfusio,
+                        "colfasce" : jsonData.colfasce,
+                        "girispazz" : jsonData.girispazz,
+                        "motore" : jsonData.motore,
+                        "voltaggio" : jsonData.voltaggio,
+                        "spazzola" : jsonData.spazzola,
+                        "spazzinclu" : jsonData.spazzinclu,
+                        "abrasione" : jsonData.abrasione,
+                        "sfiaria" : jsonData.sfiaria,
+                        "ingraria" : jsonData.ingraria,
+                        "scaria" : jsonData.scaria,
+                        "compmanut" : jsonData.compmanu,
+                        "opmaxcont" : jsonData.opmaxcont,
+                        "convelettrvel" : jsonData.convelettrvel,
+                        "pulvibrfiltro" : jsonData.pulvibrfiltro,
+                        "applsu" : jsonData.applsu,
+                        "monoblosep" : jsonData.monoblosep,
+                        "diatubo" : jsonData.diatubo,
+                        "permotori" : jsonData.permotori,
+                        "motorimax" : jsonData.motorimax,
+                        "diaing" : jsonData.diaing,
+                        "tensalimelett" : jsonData.tensalimelett,
+                        "presslav" : jsonData.presslav,
+                        "perso" : jsonData.perso,
+                        "barratubo1m" : jsonData.barratubo1m,
+                        "manicgiunz" : jsonData.manicgiunz,
+                        "curva90" : jsonData.curva90,
+                        "grigliascarico" : jsonData.grigliascarico,
+                        "persistmod" : jsonData.persistmod,
+                        "compgestmot" : jsonData.compgestmot,
+                        "rompivuoto" : jsonData.rompivuoto,
+                        "opmax32" : jsonData.opmax32,
+                        "opmax40" : jsonData.opmax40,
+                        "griprotfiltr" : jsonData.griprotfiltr,
+                        "scariautom" : jsonData.scariautom,
+                        "schedgestasp" : jsonData.schedgestasp,
+                        "pressattpne" : jsonData.pressattpne,
+                        "pressugelli" : jsonData.pressugelli,
+                        "tuboflessdot" : jsonData.tuboflessdot,
+                        "lungmaxtubo" : jsonData.lungmaxtubo,
+                        "pulsanti" : jsonData.pulsanti,
+                        "regpress" : jsonData.regpress,
+                        "raccordo360" : jsonData.raccordo360
+                     */
+                
                 };
 
                 const headerTitles1 = { 
@@ -144,56 +490,57 @@ function createPdfFromJsonFile(jsonFilePath) {
                 };
                 
 
-                const testoSottoFoto = jsonData.princApp;
+                const princapp = jsonData.princapp;
                 const testoSottoGrafico1 = jsonData.testoSottoGrafico1;
 
                 // costanti titoli
                 const titolo1 = "Principali Applicazioni";
                 const titolo2 = "Dati tecnici";
-                let titoloSottoGrafico1;
-                if(azienda == 1 ){
-                    titoloSottoGrafico1 = "Grafico di prestazione";
-                }else{
-                    if(azienda == 2){
-                        titoloSottoGrafico1 = "Sequenza di monitoraggio";
-                    }
-                }
+                let titoloSottoGrafico1= "Grafico di prestazione";
+                //if(company == 1 ){
+                    //titoloSottoGrafico1 = "Grafico di prestazione";
+                //}else{
+                  //  if(company == 2){
+                      //  titoloSottoGrafico1 = "Sequenza di montaggio";
+                  //  }
+                //}
+                let titoloSottoGrafico1_2 = "Sequenza di montaggio";
                     
                 let titoloSottoGrafico3;
                 const titoloSottoGrafico2 = "Omologazioni";
-                if(azienda == '1'){
+                if(company == '1'){
                     titoloSottoGrafico3 = "Conformità e normative";
                 }else{
-                    if(azienda == '2'){
+                    if(company == '2'){
                         titoloSottoGrafico3 = "Consigli per la posa";
                     }
                 }
                 let titoloSottoGrafico4;
-                if(azienda == '1'){
+                if(company == '1'){
                     titoloSottoGrafico4 = "Conformità";
                 }else{
-                    if(azienda == '2'){
+                    if(company == '2'){
                         titoloSottoGrafico4 = "Prova di Carico";
                     }
                 }
                 let titoloSottoGrafico5;
-                if(azienda =='1'){
+                if(company =='1'){
                     titoloSottoGrafico5 = "Normative armonizzate applicate";
                 }
                 else{
-                    if(azienda=='2'){
+                    if(company=='2'){
                         titoloSottoGrafico5 = "Certificazioni";
                     }
                 }
 
-                let headers = [];
+                let headers =["Parametro", "Valore", "Unita"];
                 let headers1 = ["Parametro", "Valore", "Unita"];
-                if(azienda == '1'){
+                /*if(azienda == '1'){
                     headers = ["Parametro", "Valore", "Unita"];
                 }
                 else{                
                     headers = ["Parametro", "Unita", "Descrizione", "Valore", "Sku"];
-                }
+                }*/
                 let suffixies =[];
                 suffixies = headers.map(header => 
                     header.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
@@ -396,7 +743,7 @@ function createPdfFromJsonFile(jsonFilePath) {
                     let wPhoto = 65;
                     let spacef = 5*(n1+1);
                     let space7 = doc1.getTextDimensions(titolo1).h + 5;
-                    let space8 = space7 +  doc1.getTextDimensions(testoSottoFoto).h + 25;
+                    let space8 = space7 + doc1.getTextDimensions(princapp).h + 25;
                     let cimgy = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
                     let cimgy1 = y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8;
                     let d1 = ( (wtot - (y + space1 + space2 + space3 + space4 + space5 + space6 + space7 + space8) ) / carLenght)/4;
@@ -406,9 +753,9 @@ function createPdfFromJsonFile(jsonFilePath) {
                     let cimgh = (cimgw*1.5)/2;
                     let cimgh1 = cimgw1;
                     let hgr2 = cimgh + 10;
-                    let space9 =  doc1.getTextDimensions(testoSottoFoto).h; // + 10;
-                    let space9_a = doc1.getTextDimensions(testoSottoFoto).h * 2;
-                    let space9_a1 = (doc1.getTextDimensions(testoSottoFoto).h + cimgh1)* 2;
+                    let space9 =  doc1.getTextDimensions(princapp).h; // + 10;
+                    let space9_a = doc1.getTextDimensions(princapp).h * 2;
+                    let space9_a1 = (doc1.getTextDimensions(princapp).h + cimgh1)* 2;
                     let spaceimg1 = 5;
                     let space10 = doc1.getTextDimensions(titolo2).h;
                     let space12 = 9;
@@ -425,31 +772,43 @@ function createPdfFromJsonFile(jsonFilePath) {
                     let space21 = 5 + doc1.getTextDimensions(testoSottoGrafico1).h;
                     let space22 = 7;
                     let space22_1 = space22 * (n4+1);
-                    let space23 = 3;
-                    let space24 =  doc1.getTextDimensions(testoSottoGrafico1).h + 10;
-                    const footerHeight = 50; // Altezza del piè di pagina
+                    let space23 = 10;
+                    let space24 =  doc1.getTextDimensions(testoSottoGrafico1).h  + 10;
+                    const footerHeight = 40; // Altezza del piè di pagina
 
 
+                    console.log('tab',spacetab1,'imgs', yGr1, yGr1+35);
                     if(spacetab1 < yGr1){
-                        spacetab1 = yGr1 + 35;
+                        spacetab1 = yGr1;// + 35;
+                        if(company == '1'){
+                            spacetab1 -= 40;
+                        }
                     }
+                    else{
+                        if(company == '1'){
+                            spacetab1 -= 70;
+                        }
+                        else
+                        spacetab1 -= 40;
 
-                    if(azienda == '1'){
-                        y1 = y1 + hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
+                    }
+                    console.log('dopotab',spacetab1);
+
+                    if(company == '1'){
+                        y1 =    + hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
                                 + space7 + space8 + space9 + spacetab1 + space10  + space12 + space13 + space14  + space15_1 
-                                + space16 + space17 + space18 +  space19_1 + space20 + space21  + space22_1 ;
+                                + space16 + space17 + space18 +  space19_1 + space20 + space21 + space23 + space22_1 + footerHeight + 10;
                                 
                     }else{
-                        if(azienda == '2'){
-                            y1 = y1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
+                        if(company == '2'){
+                            y1 =    + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
                                     + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16 
                                     + space17 + space18 + spacetab2 + space21 + space21 + space21 + space22_1  
-                                    + ((space9+10));
+                                    + ((space9+10)) + footerHeight + 10+ space23;
                     
                         }
                     }
                     
-                    let footerY = y1 ; // Posizione verticale
                     // console.log('y1', y1, footerY);
                     const htot = y1; // + footerHeight;
 
@@ -458,7 +817,10 @@ function createPdfFromJsonFile(jsonFilePath) {
                     unit: "mm",                     // Unità di misura ("mm", "cm", "in", "px")
                     //format: [wtot, htot-10]       // Larghezza e altezza personalizzate in mm
                     format: [wtot, y1]
-                });           
+                });         
+                
+                let hGr = 60;
+                let wGr = 60;  
 
                     //font                   
                     doc.addFileToVFS("KohinoorLatin-Demi.ttf", base64Demi);
@@ -476,7 +838,7 @@ function createPdfFromJsonFile(jsonFilePath) {
                     // nome prodotto
                     doc.setFontSize(25);
                     doc.setFont("helvetica", "bold");
-                    doc.text(nomeProdotto, x, y);
+                    doc.text(nome, x, y);
 
                     // numero articolo (prodotto)
                     doc.setFontSize(15)
@@ -484,7 +846,7 @@ function createPdfFromJsonFile(jsonFilePath) {
                     y += space1;
                     
                     doc.setFont("helvetica", "normal");
-                    doc.text(numeroProdotto, x, y);
+                    doc.text(sku, x, y);
 
                     let xLogo = wtot-45;
                     let yLogo = 5;
@@ -498,8 +860,8 @@ function createPdfFromJsonFile(jsonFilePath) {
                     y += space2;
 
                     // foto prodotto
-                    if (fotoprodotto && fs.existsSync(fotoprodotto)) {
-                        const imageData = fs.readFileSync(fotoprodotto).toString('base64');
+                    if (img1 && fs.existsSync(img1)) {
+                        const imageData = fs.readFileSync(img1).toString('base64');
                         doc.addImage(imageData, 'JPEG', 10, y, wPhoto, hPhoto);
                     }
                     let xleftPhoto = x + 75;
@@ -507,7 +869,7 @@ function createPdfFromJsonFile(jsonFilePath) {
 
                     // Testo lato foto 
                     doc.setFontSize(8);
-                    doc.text(testoLatoFoto, xleftPhoto, yleftPhoto, { maxWidth: wtot -100 });
+                    doc.text(descr, xleftPhoto, yleftPhoto, { maxWidth: wtot -100 });
                     // console.log(doc.getTextDimensions(testoLatoFoto).h);
                     y = y  + space4 ;
                     // Elenco puntato lato alla foto
@@ -531,13 +893,13 @@ function createPdfFromJsonFile(jsonFilePath) {
                     // Testo sotto foto 
                     doc.setFontSize(10);
                     doc.setFont("helvetica", "normal");
-                    doc.text(testoSottoFoto, x, y, { maxWidth: wtot - 20 });
+                    doc.text(princapp, x, y, { maxWidth: wtot - 20 });
                     y = y +  space8;
 
                     
                     let cimgx = x;
                     let cimgx1 = x;
-                    if(azienda == '1'){
+                    if(company == '1'){
                         // console.log('d', d1);
                         //  foto carosello            
                         // console.log('n', carLenght, i);
@@ -551,8 +913,8 @@ function createPdfFromJsonFile(jsonFilePath) {
                         }
                         y = y + space9; 
                     }else{
-                        if(azienda == '2'){
-                        for(let ic1 = 0; ic1 <=carLenght; ic1++){
+                        if(company == '2'){
+                        /*for(let ic1 = 0; ic1 <=carLenght; ic1++){
                             if(cimgx1 >= (wtot-20)/2){
                                 cimgx1 = cimgx;
                                 cimgy1 = cimgy1 + cimgh1 + spaceimg1; 
@@ -564,10 +926,23 @@ function createPdfFromJsonFile(jsonFilePath) {
                                 cimgx1 += cimgw1 + d1;
                             }
                         }
-                        y = y+ cimgh1 + space9_a;
+                        y = y+ cimgh1 + space9_a;*/
+                        if(company == '2'){
+                            //  foto carosello            
+                            // console.log('n', carLenght, i);
+                            for(let ic = 0; ic <=carLenght; ic++){
+                                if(carosello[ic] && fs.existsSync(carosello[ic])){
+                                    var imgCar = fs.readFileSync(carosello[ic]).toString('base64');
+                                    doc.addImage(imgCar, 'JPEG', cimgx, cimgy, cimgw, cimgh);                    
+                                // aumento x dopo ogni img
+                                    cimgx += cimgw + d1;
+                                }
+                            } 
+                        }
                         }
                     }
                     y += 15;
+                    
                     //titolo sopra tabella
                     doc.setFontSize(12);
                     doc.setFont("helvetica", "bold");
@@ -623,13 +998,13 @@ function createPdfFromJsonFile(jsonFilePath) {
                         //let xGr     =  25;
                         let yGr     = (Math.ceil(doc.lastAutoTable.finalY)/6.5);
                     
-                        if (graficoLatoTabella1 && fs.existsSync(graficoLatoTabella1)) {
-                            const imageData = fs.readFileSync(graficoLatoTabella1).toString('base64');
+                        if (img12 && fs.existsSync(img12)) {
+                            const imageData = fs.readFileSync(img12).toString('base64');
                             doc.addImage(imageData, 'JPEG', x, y, xGr, yGr);
                         }
 
-                        if (graficoLatoTabella2 && fs.existsSync(graficoLatoTabella2)) {
-                            const imageData = fs.readFileSync(graficoLatoTabella2).toString('base64');
+                        if (img13 && fs.existsSync(img13)) {
+                            const imageData = fs.readFileSync(img13).toString('base64');
                             doc.addImage(imageData, 'JPEG', x, y + space, xGr, yGr);
                         }
                         
@@ -656,18 +1031,16 @@ function createPdfFromJsonFile(jsonFilePath) {
                         doc.setFont("helvetica", "bold");
                         doc.text(titoloSottoGrafico1, x, y, { maxWidth: wtot - 20 });
                         diff = x + diff;
-                        if(azienda =='1')
+                        if(company =='1')
                             doc.text(titoloSottoGrafico2, diff, y, { maxWidth: wtot - 20 });
                         y = y + space13;
 
                         // "grafico"                 
                         doc.setFontSize(10);
-                        let hGr = 60;
-                        let wGr = 60;
-                        if(azienda == '1'){
+                        if(company == '1'){
                             hGr = 40;
-                            if (graficoSottoTabella && fs.existsSync(graficoSottoTabella)) {
-                                const imageData = fs.readFileSync(graficoSottoTabella).toString('base64');
+                            if (img14 && fs.existsSync(img14)) {
+                                const imageData = fs.readFileSync(img14).toString('base64');
                                 doc.addImage(imageData, 'JPEG', x, y, hGr, wGr);
                             }
                         
@@ -686,9 +1059,9 @@ function createPdfFromJsonFile(jsonFilePath) {
                         }
                     
 
-                        if(azienda == '2'){
+                        /*if(company == '2'){
                             hGr = cimgh+10;
-                            // console.log('d', d1);
+                           
                             cimgx = x;
                             cimgy = y;
                             //  foto carosello            
@@ -696,12 +1069,13 @@ function createPdfFromJsonFile(jsonFilePath) {
                             for(let ic = 0; ic <=carLenght; ic++){
                                 if(carosello[ic] && fs.existsSync(carosello[ic])){
                                     var imgCar = fs.readFileSync(carosello[ic]).toString('base64');
-                                    doc.addImage(imgCar, 'JPEG', cimgx, cimgy, cimgw, cimgh);                    
+                                    doc.addImage(imgCar, 'JPEG', cimgx, cimgy, cimgw, cimgh);    
+                                    doc.text('sn qui',x,y)                
                                 // aumento x dopo ogni img
                                     cimgx += cimgw + d1;
                                 }
                             }                    
-                        }
+                        }*/
 
                         y += hGr;
                         //titolo sotto grafico
@@ -714,7 +1088,7 @@ function createPdfFromJsonFile(jsonFilePath) {
                         doc.setFont("helvetica", "normal");
                         doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
 
-                        if(azienda == '2'){
+                        if(company == '2'){
                         let y2 = y + 10; 
                         y =  y2+ space9;
                             for(let j = 0; j<7; j++){
@@ -735,7 +1109,7 @@ function createPdfFromJsonFile(jsonFilePath) {
                         doc.setFont("helvetica", "normal");
 
                         //elencoPuntatoSottoGrafico    
-                        if(azienda == '1'){
+                        if(company == '1'){
                             for(let j = 4; j<7; j++){
                                 if (elencop3[j]) {
                                     doc.text(`• ` + elencop3[j], x, y);
@@ -746,7 +1120,7 @@ function createPdfFromJsonFile(jsonFilePath) {
                         y += space20 ;
 
                         }else{
-                            if(azienda == '2'){
+                            if(company == '2'){
                                 // console.log('y prima di tabDat1: ', y);
                                     const columnWidths1 = getOptimalColumnWidths(headers1, tableData1, doc);      
                                     const tableWidth1 = columnWidths1.reduce((totalWidth1, width1) => totalWidth1 + width1, 0);
@@ -791,7 +1165,7 @@ function createPdfFromJsonFile(jsonFilePath) {
                         // console.log('y dopo di tabDat1: ', y);
 
                         doc.setFont("helvetica", "normal");
-                        if(azienda == '2'){
+                        if(company == '2'){
                             
                         doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
                         y = y + space21;
@@ -802,12 +1176,12 @@ function createPdfFromJsonFile(jsonFilePath) {
                         y = y + space21;
                         doc.setFont("helvetica", "normal");
 
-                        if(azienda == '2'){
+                        if(company == '2'){
                             doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
                             y = y + space21;
                         }
 
-                        y += space23;
+                        //y += space23;
 
                         for(let j =8; j<12; j++){ //n4 8 12
                             if (elencop4[j]) {
@@ -815,9 +1189,11 @@ function createPdfFromJsonFile(jsonFilePath) {
                                 y += space22;
                             }
                         }
+                        y += space23;
                         //testo sotto grafico 2
                         doc.setFontSize(7);
-                        doc.text(testoSottoGrafico1, x, y ,{ maxWidth: wtot - 20 });
+                        doc.text(testoSottoGrafico1, x, y1-footerHeight-5 ,{ maxWidth: wtot - 20 });
+                        y += space24;
 
                         // console.log('y finale: ', y);
                         // console.log('y1 totale: ', y1);
@@ -826,15 +1202,15 @@ function createPdfFromJsonFile(jsonFilePath) {
                     doc.setFontSize(10);
                 
                     /**
-                     * stampa pie di pagina
+                     * stampa pie di pagina*/
                     if (piedipagina && fs.existsSync(piedipagina)) {
-                        const imgData = jsonData.pie_di_pagina;
-                        
-                        doc.addImage(imgData, 'JPEG', 0, footerY, wtot, footerHeight/2);            
-                    }*/
+                        const imageData = fs.readFileSync(piedipagina).toString('base64');
+                        console.log("stampa pie di pagina");
+                        doc.addImage(imageData, 'JPEG', 0, y1-footerHeight, wtot, footerHeight);            
+                    }
                 
 
-
+                    //sku+it
                     doc.save('provaPdf.pdf');
                     // console.log(`✅ PDF salvato `);
                     //console.log(`✅ PDF salvato su: ${pdfPath}`);
@@ -847,7 +1223,7 @@ function createPdfFromJsonFile(jsonFilePath) {
     }
 
     console.log('Call Function for the creation of the PDF file..')
-    createPdfFromJsonFile(jsonFilePath);
+    createPdfFromJsonFile(jsonFilePath, jsonFIlePath2);
 
 /**CONVERSIONE BINARIO -- JPEG per pdf
  * 
@@ -872,32 +1248,32 @@ doc.save("documento.pdf");
 
 
 
-                // Converte il PDF in immagine --- DA RIVEDERE
-                /*pdfPoppler.convert(graficoSottoTabella_p, opts)
-                    .then(() => {
-                        console.log("Conversione completata!");
+// Converte il PDF in immagine --- DA RIVEDERE
+/*pdfPoppler.convert(graficoSottoTabella_p, opts)
+    .then(() => {
+        console.log("Conversione completata!");
 
-                        // Legge tutti i file nella cartella images/
-                        const files = fs.readdirSync(outputDir);
-                        console.log("File presenti nella cartella:", files);
+        // Legge tutti i file nella cartella images/
+        const files = fs.readdirSync(outputDir);
+        console.log("File presenti nella cartella:", files);
 
-                        // Trova il primo file che corrisponde al nome base del PDF
-                        const outputImage = files.find(file => file.startsWith(opts.out_prefix) && file.endsWith('.jpg'));
+        // Trova il primo file che corrisponde al nome base del PDF
+        const outputImage = files.find(file => file.startsWith(opts.out_prefix) && file.endsWith('.jpg'));
 
-                        if (outputImage) {
-                            const imagePath = path.join(outputDir, outputImage);
-                            console.log("Immagine trovata:", imagePath);
+        if (outputImage) {
+            const imagePath = path.join(outputDir, outputImage);
+            console.log("Immagine trovata:", imagePath);
 
-                            // Legge il file immagine e lo converte in base64
-                            const imageData = fs.readFileSync(imagePath).toString('base64');
+            // Legge il file immagine e lo converte in base64
+            const imageData = fs.readFileSync(imagePath).toString('base64');
 
-                            // Aggiunge l'immagine al PDF (assumendo che `doc` sia il tuo documento)
-                            doc.addImage(imageData, 'JPEG', x, y, hGr, wGr);
-                            console.log("Immagine aggiunta con successo al PDF!");
-                        } else {
-                            console.error("Errore: nessun file immagine trovato dopo la conversione!");
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Errore nella conversione:", err);
-                    });*/
+            // Aggiunge l'immagine al PDF (assumendo che `doc` sia il tuo documento)
+            doc.addImage(imageData, 'JPEG', x, y, hGr, wGr);
+            console.log("Immagine aggiunta con successo al PDF!");
+        } else {
+            console.error("Errore: nessun file immagine trovato dopo la conversione!");
+        }
+    })
+    .catch(err => {
+        console.error("Errore nella conversione:", err);
+    });*/
