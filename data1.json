@@ -20,7 +20,8 @@
     "air_cloudvalore": "Cloud1",
     "air_cloudsku": "12345",
 
-    "alimentazione": "Alimentazione",
+    "alim": "alimentazione",
+    
     "alimentazioneparametro": "Tensione di alimentazione",
     "alimentazioneunita": "V ac",
     "alimentazionedescrizione": "Tensione richiesta per il funzionamento",

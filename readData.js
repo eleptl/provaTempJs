@@ -37,15 +37,17 @@ let base64Light2 = convertTTFtoBase64(fontPathLight2);
 const jsonFilePath = 'data1.json';
 const jsonFIlePath2 = 'data2.json';
 
+let jsonData2;
+
 // function for create pdf
 function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
-    fs.readFile(jsonFilePath, 'utf8', (err, data2) => {
+    fs.readFile(jsonFIlePath2, 'utf8', (err, data2) => {
         if (err) {
             console.error('Errore nella lettura del file:', err);
             return;
         }
     
-        const jsonData2 = JSON.parse(data2);
+        jsonData2 = JSON.parse(data2);
     })
 
 
@@ -87,8 +89,8 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                     
                     //"air_cloud": jsonData.air_cloud,
                        
-                    "alimentazione": jsonData.alimentazione,
-                    "alimentazione_prese": jsonData.alimentazione_prese,
+                    "alim": "alim", //jsonData.alim,
+                    /*"alimentazione_prese": jsonData.alimentazione_prese,
                     "altezza": jsonData.altezza,
                     "assorbimento": jsonData.assorbimento,
                     "attacco_aspirazione_scarico": jsonData.attacco_aspirazione_scarico,
@@ -143,7 +145,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                     "superficie_max_da_pulire": jsonData.superficie_max_da_pulire,
                     "tendisacco": jsonData.tendisacco,
                     "uscita_aria": jsonData.uscita_aria,
-                    "valvola_rompivuoto_di_sicurezza": jsonData.valvola_rompivuoto_di_sicurezza,
+                    "valvola_rompivuoto_di_sicurezza": jsonData.valvola_rompivuoto_di_sicurezza,*/
                     /**
                      * "cap" : jsonData.cap,
                         "misura" : jsonData.misura,
@@ -481,7 +483,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                 const headerTitles1 = { 
                     
                     "air_cloud": jsonData.air_cloud,   
-                    "alimentazione": jsonData.alimentazione,
+                    "alim": jsonData.alim,
                     "alimentazione_prese": jsonData.alimentazione_prese,
                     "altezza": jsonData.altezza,
                     "assorbimento": jsonData.assorbimento,
@@ -495,7 +497,13 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
 
                 // costanti titoli
                 const titolo1 = "Principali Applicazioni";
-                const titolo2 = "Dati tecnici";
+                let titolo2;
+                if(company == '1'){
+                    titolo2 = "Dati tecnici";
+                }else{
+                    titolo2 = "Condizioni di installazione";
+                } 
+                
                 let titoloSottoGrafico1= "Grafico di prestazione";
                 //if(company == 1 ){
                     //titoloSottoGrafico1 = "Grafico di prestazione";
@@ -535,12 +543,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
 
                 let headers =["Parametro", "Valore", "Unita"];
                 let headers1 = ["Parametro", "Valore", "Unita"];
-                /*if(azienda == '1'){
-                    headers = ["Parametro", "Valore", "Unita"];
-                }
-                else{                
-                    headers = ["Parametro", "Unita", "Descrizione", "Valore", "Sku"];
-                }*/
+
                 let suffixies =[];
                 suffixies = headers.map(header => 
                     header.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
@@ -552,22 +555,61 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                 
 
                     // Aggiornato: Creazione dati tabella con dati in base agli headers
-                    const tableData = Object.entries(headerTitles)
+                    /*const tableData = Object.entries(headerTitles)
                     .filter(([_, value]) => value)
                         .map(([key, value]) => {
                             const row = [];
                     
                         suffixies.forEach(suffix => {
+                            
                             if(suffix == 'parametro')
                                 suffix = '';
-                            const colid = `${key}${suffix}`;             
+                            const colid = `${key}`;  
+                            if (suffix === "unita") {
+                                // Prendi il valore dal secondo JSON (unitJsonData)
+                                cellValue = jsonData2[colid] || "-";
+                            }
+
+
 
                             row.push(jsonData[colid] || "-");
                         });        
                         const isEmptyRow = row.every(cell => cell === "-" || cell === null || cell === "");
                         return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
                     })
-                    .filter(row => row !== null); // Rimuove le righe vuote
+                    .filter(row => row !== null); // Rimuove le righe vuote*/
+
+                    // Creazione dati tabella con dati in base agli headers
+// Creazione dati tabella con dati in base agli headers
+const tableData = Object.entries(headerTitles)
+    .filter(([_, value]) => value) // Filtra solo gli header attivi
+    .map(([key, value]) => {
+        const row = [];
+
+        suffixies.forEach(suffix => {
+            let cellValue = "-";
+
+            if (suffix === "parametro") {
+                // Prende direttamente la chiave (es. 'alim')
+                cellValue = key;
+            } else if (suffix === "valore") {
+                // Prende il valore da jsonData (es. 'alimentazione a')
+                cellValue = jsonData[key] || "-";
+            } else if (suffix === "unita") {
+                // Prende il valore da jsonData2 (es. 'V ac')
+                cellValue = jsonData2[key] || "-";
+            }
+
+            row.push(cellValue);
+        });
+
+        const isEmptyRow = row.every(cell => cell === "-" || cell === null || cell === "");
+        return isEmptyRow ? null : row; // Esclude la riga se tutti i campi sono vuoti
+    })
+    .filter(row => row !== null); // Rimuove le righe vuote
+
+
+
                     
                     //w tab
                     let maxDataWidth = 0;
@@ -730,7 +772,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                     //spaces
                     let spacetab1 = calculateTableHeight(tableData,  fontCalc,lineSpacCalc);
                     let yGr1 =( spacetab1 / 6.5)*2 + 35;
-                    let spacetab2 = calculateTableHeight(tableData1, fontCalc,lineSpacCalc);
+                    let spacetab2 = 0;//calculateTableHeight(tableData1, fontCalc,lineSpacCalc);
                     let space1 = 6;
                     let space2 = 10;
                     let space3 = 3;
@@ -752,7 +794,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                     let cimgw1 =( ( (wtot/carLenght) *3)/4);
                     let cimgh = (cimgw*1.5)/2;
                     let cimgh1 = cimgw1;
-                    let hgr2 = cimgh + 10;
+                    let hgr2 =hgr1;// cimgh + 10;
                     let space9 =  doc1.getTextDimensions(princapp).h; // + 10;
                     let space9_a = doc1.getTextDimensions(princapp).h * 2;
                     let space9_a1 = (doc1.getTextDimensions(princapp).h + cimgh1)* 2;
@@ -768,21 +810,21 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                     let space18 =  5 + doc1.getTextDimensions(testoSottoGrafico1).h;
                     let space19 = 7;
                     let space19_1 = space19 * (n3+1);
-                    let space20 = 5;
+                    let space20 = 0;//5;
                     let space21 = 5 + doc1.getTextDimensions(testoSottoGrafico1).h;
                     let space22 = 7;
                     let space22_1 = space22 * (n4+1);
                     let space23 = 10;
-                    let space24 =  doc1.getTextDimensions(testoSottoGrafico1).h  + 10;
+                    let space24 =  doc1.getTextDimensions(testoSottoGrafico1).h ;// + 10;
                     const footerHeight = 40; // Altezza del piè di pagina
 
 
                     console.log('tab',spacetab1,'imgs', yGr1, yGr1+35);
                     if(spacetab1 < yGr1){
                         spacetab1 = yGr1;// + 35;
-                        if(company == '1'){
-                            spacetab1 -= 40;
-                        }
+                        //if(company == '1'){
+                            spacetab1 -= 60;
+                        //}
                     }
                     else{
                         if(company == '1'){
@@ -796,14 +838,14 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
 
                     if(company == '1'){
                         y1 =    + hgr1 + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 
-                                + space7 + space8 + space9 + spacetab1 + space10  + space12 + space13 + space14  + space15_1 
+                                + space7 + space8 + space9 + spacetab1 + space10  + /**space12*/ + space13 + space14  + space15_1 
                                 + space16 + space17 + space18 +  space19_1 + space20 + space21 + space23 + space22_1 + footerHeight + 10;
                                 
                     }else{
                         if(company == '2'){
                             y1 =    + space1 + space2 + space3 + space4 + space5_1 + spacef + space6 + space9_a1
-                                    + space7 + space8 + space10 + spacetab1 + space12 + space13 + hgr2 + space16 
-                                    + space17 + space18 + spacetab2 + space21 + space21 + space21 + space22_1  
+                                    + space7 + space8 + space10 + spacetab1 + /**space12+ space13*/  + hgr2 + space16 
+                                    + space17 + space18 + space21 + space21 + space21 + space22_1  
                                     + ((space9+10)) + footerHeight + 10+ space23;
                     
                         }
@@ -898,11 +940,12 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
 
                     
                     let cimgx = x;
-                    let cimgx1 = x;
                     if(company == '1'){
                         // console.log('d', d1);
                         //  foto carosello            
                         // console.log('n', carLenght, i);
+
+
                         for(let ic = 0; ic <=carLenght; ic++){
                             if(carosello[ic] && fs.existsSync(carosello[ic])){
                                 var imgCar = fs.readFileSync(carosello[ic]).toString('base64');
@@ -914,6 +957,12 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                         y = y + space9; 
                     }else{
                         if(company == '2'){
+
+                            doc.setFontSize(12);
+                            doc.setFont("helvetica", "bold");
+                                
+                            doc.text(titoloSottoGrafico1_2, cimgx, cimgy-4, { maxWidth: wtot - 20 });
+                       
                         /*for(let ic1 = 0; ic1 <=carLenght; ic1++){
                             if(cimgx1 >= (wtot-20)/2){
                                 cimgx1 = cimgx;
@@ -927,7 +976,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                             }
                         }
                         y = y+ cimgh1 + space9_a;*/
-                        if(company == '2'){
+                       
                             //  foto carosello            
                             // console.log('n', carLenght, i);
                             for(let ic = 0; ic <=carLenght; ic++){
@@ -939,9 +988,8 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                                 }
                             } 
                         }
-                        }
                     }
-                    y += 15;
+                    y += space3;
                     
                     //titolo sopra tabella
                     doc.setFontSize(12);
@@ -990,6 +1038,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                         tableLineWidth: 0.1,                                // Larghezza del bordo
                     }); 
                     const xT = marginLeft + tableWidth + 2.5; 
+                    let space11 = Math.ceil(doc.lastAutoTable.finalY)+10; 
 
                         x += xT;
                         // console.log('y dopo di tabDat: ', doc.lastAutoTable.finalY);
@@ -1009,24 +1058,21 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                         }
                         
                         //guardo fino a dove è arrivata la tabella
-                        let space11 = Math.ceil(doc.lastAutoTable.finalY)+10; 
+                       
                         let space11a =y+ (yGr * 2 ) + 5;
                         
-                        // ('space11',space11);
-                        // console.log('space11a',space11a);
                         if(space11 <= space11a)
                             space11 = space11a;
-                        
-                        // console.log('space11 dopo', space11)
 
                         // console.log(space11,space11a);
-                        y = space11 + space12 ;
+                        y = space11;// + space12 ;
                         // console.log(y)
 
                         //agg. coordinate
                         x = 10;
                         let diff = 105;
 
+                    if(company == '1'){
                         doc.setFontSize(12);
                         doc.setFont("helvetica", "bold");
                         doc.text(titoloSottoGrafico1, x, y, { maxWidth: wtot - 20 });
@@ -1037,7 +1083,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
 
                         // "grafico"                 
                         doc.setFontSize(10);
-                        if(company == '1'){
+                        //if(company == '1'){
                             hGr = 40;
                             if (img14 && fs.existsSync(img14)) {
                                 const imageData = fs.readFileSync(img14).toString('base64');
@@ -1056,7 +1102,9 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                                         y += space15;
                                     }
                                 }
-                        }
+                        //}
+                        y += hGr;
+                    }
                     
 
                         /*if(company == '2'){
@@ -1077,7 +1125,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                             }                    
                         }*/
 
-                        y += hGr;
+                        
                         //titolo sotto grafico
                         doc.setFont("helvetica", "bold");
                         doc.setFontSize(12);
@@ -1090,7 +1138,6 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
 
                         if(company == '2'){
                         let y2 = y + 10; 
-                        y =  y2+ space9;
                             for(let j = 0; j<7; j++){
                                 
                                 if (jsonData[`elencoPuntatoLatoGrafico${j}`]) {
@@ -1098,6 +1145,8 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                                     y2 += 4;
                                 }
                             }
+                            
+                            y =  y2+ space9;
                         }
                     
                         y = y + space17;
@@ -1109,7 +1158,7 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                         doc.setFont("helvetica", "normal");
 
                         //elencoPuntatoSottoGrafico    
-                        if(company == '1'){
+                        //if(company == '1'){
                             for(let j = 4; j<7; j++){
                                 if (elencop3[j]) {
                                     doc.text(`• ` + elencop3[j], x, y);
@@ -1117,12 +1166,12 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                                 }
                             }
                             
-                        y += space20 ;
+                        y += 4 ;
 
-                        }else{
-                            if(company == '2'){
+                        // }else{
+                           //  if(company == '2'){
                                 // console.log('y prima di tabDat1: ', y);
-                                    const columnWidths1 = getOptimalColumnWidths(headers1, tableData1, doc);      
+                                    /*const columnWidths1 = getOptimalColumnWidths(headers1, tableData1, doc);      
                                     const tableWidth1 = columnWidths1.reduce((totalWidth1, width1) => totalWidth1 + width1, 0);
 
                                 doc.autoTable({
@@ -1157,31 +1206,37 @@ function createPdfFromJsonFile(jsonFilePath, jsonFIlePath2) {
                                     }, {}),
                                     tableLineColor: [0, 0, 0],                          // Colore dei bordi (nero)
                                     tableLineWidth: 0.1,                                // Larghezza del bordo
-                                }); 
-                                y = Math.ceil(doc.lastAutoTable.finalY)+10;
-                    
-                            }
-                        }
+                                }); */
+                                // y = Math.ceil(doc.lastAutoTable.finalY)+10;
+                            // }
+                        // }
                         // console.log('y dopo di tabDat1: ', y);
 
+                        // if(spacetab1 < yGr1){
+                          //  y += yGr1;
+                        // }else{
+                            // y = Math.ceil(doc.lastAutoTable.finalY)+10;
+                        // }
                         doc.setFont("helvetica", "normal");
                         if(company == '2'){
                             
                         doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
-                        y = y + space21;
+                         y = y + space21;
                         }
                         //titolo sotto grafico 2                
                         doc.setFont("helvetica", "bold");
                         doc.text(titoloSottoGrafico5, x, y, { maxWidth: wtot - 20 });
-                        y = y + space21;
+                       
+                        
                         doc.setFont("helvetica", "normal");
 
                         if(company == '2'){
+                            y = y + space21;
                             doc.text(testoSottoGrafico1, x, y, { maxWidth: wtot - 20 });
                             y = y + space21;
                         }
 
-                        //y += space23;
+                        y += space23;
 
                         for(let j =8; j<12; j++){ //n4 8 12
                             if (elencop4[j]) {
